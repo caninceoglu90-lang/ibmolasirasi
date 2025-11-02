@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="tr" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mola Sırası</title>
+  <!-- Google Fonts: Inter, Montserrat ve blob metni için Dongle -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600&family=Dongle&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+#canvas-stars {
+      background: black;
+      z-index: 2;
+    }
+#canvas-stars, #canvas-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #canvas-shapes { z-index: 2; }
+    #toggleHint {
+      color: #8f9ebb;
+      font-size: 16px;
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      z-index: 3;
+      user-select: none;
+      margin: 0;
+    }
+    #logoImg { display: none; }
+
+    /* ---------- DEĞİŞKENLER (Light Mode) ---------- */
+    :root {
+      --primary-color: #002f6c;
+      --light-bg: #ffffff;
+      --info-bg: #eaf4fc;
+      --button-bg: #FE9418;
+      --button-hover-bg: #ff7b28;
+      --turknet-yellow: #f9a825;
+      --font-family: "Inter", Helvetica, Arial, sans-serif;
+      --border-radius: 12px;
+      --table-header-bg: #eaf4fc; /* Açık mavi ton */
+      --table-row-even: #f9f9f9;
+      --text-muted: #555555;
+
+      /* Blob renkleri */
+      --color-bg1: rgb(108, 0, 162);
+      --color-bg2: rgb(0, 17, 82);
+      --color1: 18, 113, 255;
+      --color2: 221, 74, 255;
+      --color3: 100, 220, 255;
+      --color4: 200, 50, 50;
+      --color5: 180, 180, 50;
+      --color-interactive: 140, 100, 255;
+      --circle-size: 80%;
+      --blending: hard-light;
+    }
+
+    /* ---------- DEĞİŞKENLER (Dark Mode) ---------- */
+    html.dark-mode {
+      --primary-color: #ffffff;
+      --light-bg: #121212;
+      --info-bg: #333333;
+      --button-bg: #444444;
+      --button-hover-bg: #666666;
+      --table-header-bg: #2a2a2a;
+      --table-row-even: #1e1e1e;
+      --text-muted: #cccccc;
+    }
+
+    /* ---------- GLOBAL ---------- */
+    html, body {
+      min-height: 100vh;
+      margin: 0;
+    }
+    body {
+      font-family: var(--font-family);
+      background-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative; /* gradient-bg’i kapsayacak şekilde */
+      color: var(--primary-color);
+    }
+
+    /* ---------- GRADIENT BLOBS ARKA PLAN ---------- */
+    .gradient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
+      z-index: 0;
+    }
+    .gradient-bg svg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+    }
+    .gradient-bg .gradients-container {
+      filter: url(#goo) blur(40px);
+      width: 100%;
+      height: 100%;
+    }
+    @keyframes moveInCircle {
+      0%   { transform: rotate(0deg); }
+      50%  { transform: rotate(180deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes moveVertical {
+      0%   { transform: translateY(-50%); }
+      50%  { transform: translateY(50%); }
+      100% { transform: translateY(-50%); }
+    }
+    @keyframes moveHorizontal {
+      0%   { transform: translateX(-50%) translateY(-10%); }
+      50%  { transform: translateX(50%) translateY(10%); }
+      100% { transform: translateX(-50%) translateY(-10%); }
+    }
+    .gradient-bg .g1,
+    .gradient-bg .g2,
+    .gradient-bg .g3,
+    .gradient-bg .g4,
+    .gradient-bg .g5,
+    .gradient-bg .interactive {
+      position: absolute;
+      mix-blend-mode: var(--blending);
+      background: radial-gradient(
+        circle at center,
+        rgba(var(--color1), 0.8) 0,
+        rgba(var(--color1), 0) 50%
+      ) no-repeat;
+      width: var(--circle-size);
+      height: var(--circle-size);
+      top: calc(50% - var(--circle-size) / 2);
+      left: calc(50% - var(--circle-size) / 2);
+      opacity: 1;
+    }
+    .gradient-bg .g1 {
+      background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%) no-repeat;
+      transform-origin: center center;
+      animation: moveVertical 30s ease infinite;
+    }
+    .gradient-bg .g2 {
+      background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 50%) no-repeat;
+      transform-origin: calc(50% - 400px);
+      animation: moveInCircle 20s reverse infinite;
+    }
+    .gradient-bg .g3 {
+      background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%) no-repeat;
+      top: calc(50% - var(--circle-size) / 2 + 200px);
+      left: calc(50% - var(--circle-size) / 2 - 500px);
+      transform-origin: calc(50% + 400px);
+      animation: moveInCircle 40s linear infinite;
+    }
+    .gradient-bg .g4 {
+      background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%) no-repeat;
+      transform-origin: calc(50% - 200px);
+      animation: moveHorizontal 40s ease infinite;
+      opacity: 0.7;
+    }
+    .gradient-bg .g5 {
+      background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%) no-repeat;
+      width: calc(var(--circle-size) * 2);
+      height: calc(var(--circle-size) * 2);
+      top: calc(50% - var(--circle-size));
+      left: calc(50% - var(--circle-size));
+      transform-origin: calc(50% - 800px) calc(50% + 200px);
+      animation: moveInCircle 20s ease infinite;
+    }
+    .gradient-bg .interactive {
+      background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.8) 0, rgba(var(--color-interactive), 0) 50%) no-repeat;
+      width: 100%;
+      height: 100%;
+      top: -50%;
+      left: -50%;
+      opacity: 0.7;
+    }
+
+    /* ---------- ORİJİNAL CARD STİLLERİ (BİRKAÇ KÜÇÜK EKLEMEYLE) ---------- */
+    .card {
+      background-color: var(--light-bg);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      width: 380px;
+      max-width: 90%;
+      padding: 24px;
+      box-sizing: border-box;
+      position: relative; /* z-index tanımlamak için */
+      z-index: 1;        /* Gradient’in üstünde */
+      margin: 2rem auto;
+      color: var(--primary-color);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: left;
+      margin-bottom: 24px;
+    }
+    .logo img {
+      height: 45px;
+      width: auto;
+      margin-right: 8px;
+    }
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      line-height: 1.6rem; /* Logo ile hizayı korumak için */
+    }
+    .title {
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      text-align: left;
+      margin-bottom: 12px;
+      font-family: 'Montserrat';
+    }
+    .info-box {
+      background-color: var(--info-bg);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 0 auto 20px auto;
+      font-size: 0.95rem;
+      text-align: center;
+      color: var(--primary-color);
+      max-width: 100%;
+    }
+    .info-box strong {
+      font-weight: 500;
+    }
+    .btn-primary {
+      display: block;
+      width: 100%;
+      background-color: var(--button-bg);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 12px 0;
+      border-radius: 8px;
+      text-align: center;
+      transition: background-color 0.2s ease;
+      margin-bottom: 24px;
+    }
+    .btn-primary:hover {
+      background-color: var(--button-hover-bg);
+    }
+    .table-wrapper {
+      position: relative;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    .loader {
+      position: absolute;
+      top: -32px;
+      left: calc(50% - 32px);
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      perspective: 800px;
+      display: none;
+      z-index: 10;
+    }
+    .inner {
+      position: absolute;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+    .inner.one {
+      left: 0;
+      top: 0;
+      border-bottom: 3px solid var(--turknet-yellow);
+      animation: rotate-one 1s linear infinite;
+    }
+    .inner.two {
+      right: 0;
+      top: 0;
+      border-right: 3px solid var(--turknet-yellow);
+      animation: rotate-two 1s linear infinite;
+    }
+    .inner.three {
+      right: 0;
+      bottom: 0;
+      border-top: 3px solid var(--turknet-yellow);
+      animation: rotate-three 1s linear infinite;
+    }
+    @keyframes rotate-one {
+      from { transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg); }
+      to   { transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg); }
+    }
+    @keyframes rotate-two {
+      from { transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg); }
+      to   { transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg); }
+    }
+    @keyframes rotate-three {
+      from { transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg); }
+      to   { transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg); }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.95rem;
+      background-color: var(--light-bg);
+      color: var(--primary-color);
+    }
+    thead {
+      background-color: var(--table-header-bg);
+    }
+    th, td {
+      padding: 12px 8px;
+      text-align: left;
+    }
+    th {
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+    tbody tr:nth-child(even) {
+      background-color: var(--table-row-even);
+    }
+    .placeholder {
+      text-align: center;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 12px 0;
+    }
+    .card-footer {
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.3;
+      color: var(--text-muted);
+    }
+    .card-footer .version {
+      opacity: 0.6;      /* “v.2” kısmı biraz silik */
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .card-footer .copyright {
+      font-size: 0.67rem;
+      opacity: 0.9;      /* Telif hakkı biraz daha net */
+    }
+
+    /* ---------- TEMA DEĞİŞTİRME BUTONU (DAHA DİKKAT ÇEKİCİ) ---------- */
+    .theme-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background-color: var(--button-bg);
+      color: #ffffff;
+      border: none;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      z-index: 2;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    .theme-toggle:hover {
+      background-color: var(--button-hover-bg);
+      transform: translateY(-1px);
+    }
+    .theme-toggle:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+<!-- ⭐ Yıldız Arka Planı -->
+  <canvas id="canvas-stars"></canvas>
+  <!-- 🔄 Animasyon İpucu -->
+    <!-- ⚪ Nokta Partikülleri -->
+  <canvas id="canvas-shapes"></canvas>
+  <!-- Gizli Logo Görseli -->
+  <img id="logoImg" src="https://ik.imagekit.io/wbmhgi2rc/1e011ac7-9090-44f2-bb80-4fb5b664d66c_removalai_preview%20(2).png" crossOrigin="anonymous" alt="Logo" />
+  <!-- GSAP v1 -->
+  <!-- ---------- GRADIENT BLOBS ARKA PLAN ---------- -->
+  <div class="gradient-bg">
+    <svg xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix in="blur" mode="matrix"
+            values="1 0 0 0 0  
+                    0 1 0 0 0  
+                    0 0 1 0 0  
+                    0 0 0 18 -8"
+            result="goo" />
+          <feBlend in="SourceGraphic" in2="goo" />
+        </filter>
+      </defs>
+    </svg>
+    <div class="gradients-container">
+      <div class="g1"></div>
+      <div class="g2"></div>
+      <div class="g3"></div>
+      <div class="g4"></div>
+      <div class="g5"></div>
+      <div class="interactive"></div>
+    </div>
+  </div>
+
+  <!-- ---------- MEVCUT CARD BÖLÜMÜ ---------- -->
+  <div class="card">
+    <!-- Tema Değiştirme Butonu (Daha belirgin ikon + metin) -->
+    <button id="themeToggleBtn" class="theme-toggle" title="Karanlık moda geç">
+      🌙 Karanlık
+    </button>
+
+    <!-- Logo ve “TurkNet” Metni (Logotype olarak resim) -->
+    <div class="logo">
+      <img
+        src="https://i.imageupload.app/76f7f9d0ecbbfe762f46.png"
+        alt="TurkNet Logo"
+        onerror="this.style.display='none'"
+      />
+      <div class="logo-text">Turk<span>Net</span></div>
+    </div>
+
+    <!-- Başlık: Mola Sırası -->
+    <h1 class="title">Mola Sırası</h1>
+
+    <!-- Bilgi kutucuğu: her 5 saniyede güncellenecek -->
+    <div class="info-box">
+      Sıra bilgisi her <strong>5 saniyede</strong> güncellenir.
+    </div>
+    <div class="info-box">
+      <p class="degisken"></p>
+    </div>  
+
+    <!-- “Mola Sırasına Katıl” Butonu -->
+    <a
+      href="https://forms.gle/wFexWKf69M3uJEAx5"
+      target="_blank" class="btn-primary"
+    >Sıraya Katıl</a>
+
+    <!-- Tablo ve 3D Loader -->
+    <div class="table-wrapper">
+      <!-- 3 parçalı 3D Loader -->
+      <div class="loader" id="loader">
+        <div class="inner one"></div>
+        <div class="inner two"></div>
+        <div class="inner three"></div>
+      </div>
+
+      <table id="molaTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Zaman Damgası</th>
+            <th>Ad Soyad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="3" class="placeholder">Veri yüklenemedi.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Kart’ın hemen altında, akış içinde “v.2” ve altına telif hakkı -->
+    <div class="card-footer">
+      <div class="version">v2</div>
+      <div class="copyright">
+        © 2025 Geliştiriciler: Ahmet Can İnceoğlu ve Umut Ablay
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- JavaScript Kısmı (DÜZELTİLMİŞ BİLDİRİM KODU ve TEMA GEÇİŞİ) ---------- -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenLite.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/easing/EasePack.min.js"></script>  
+<script>
+/* === 1) Yıldız Arka Planı === */
+     (function() {
+    const canvas = document.getElementById('canvas-stars');
+    const ctx = canvas.getContext('2d');
+    const dotRadius = 2;
+    const colors = ['#002F6C', '#FFD400'];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fillStyle, alpha) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      let step = Math.PI / spikes;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.closePath();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = fillStyle;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    class Star {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.r = dotRadius;
+        this.a = Math.random() * 0.5 + 0.3;
+        this.da = (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1);
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+      }
+      update() {
+        this.a += this.da;
+        if (this.a <= 0.1 || this.a >= 1) this.da *= -1;
+      }
+      draw() {
+        drawStar(ctx, this.x, this.y, 5, this.r * 2, this.r, this.color, this.a);
+      }
+    }
+
+    let stars = [];
+    function initStars() {
+      stars = [];
+      const count = Math.floor((window.innerWidth + window.innerHeight) / 8);
+      for (let i = 0; i < count; i++) stars.push(new Star());
+    }
+    initStars();
+    window.addEventListener('resize', initStars);
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => { s.update(); s.draw(); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+
+    /* === 2) Partiküllerden Logoya Birleşme === */
+    (function() {
+  const stage = document.getElementById('canvas-shapes');
+  const ctx2 = stage.getContext('2d');
+  const img = document.getElementById('logoImg');
+  const imageW = 250, imageH = 250;
+  const dotRadius = 1.5;
+  let w, h;
+
+  const offCanvas = document.createElement('canvas');
+  const offCtx = offCanvas.getContext('2d');
+  offCanvas.width = imageW;
+  offCanvas.height = imageH;
+
+  const dots = [];
+
+  function resize() {
+    w = stage.width = window.innerWidth;
+    h = stage.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ★ Yıldız çizme fonksiyonu
+  function drawStar(ctx, cx, cy, spikes, outerR, innerR, fillStyle, alpha) {
+    let rot = Math.PI / 2 * 3;
+    const step = Math.PI / spikes;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - outerR);
+    for (let i = 0; i < spikes; i++) {
+      // dış uç
+      ctx.lineTo(
+        cx + Math.cos(rot) * outerR,
+        cy + Math.sin(rot) * outerR
+      );
+      rot += step;
+      // iç uç
+      ctx.lineTo(
+        cx + Math.cos(rot) * innerR,
+        cy + Math.sin(rot) * innerR
+      );
+      rot += step;
+    }
+    ctx.closePath();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Dot sınıfı
+  function Dot(x, y, r, g, b, imgX, imgY) {
+    this.x = x; this.y = y;
+    this.r = r; this.g = g; this.b = b;
+    this.targetX = imgX + (w - imageW) / 2;
+    this.targetY = imgY + (h - imageH) / 2;
+  }
+  // ★ draw() artık yıldız çiziyor
+  Dot.prototype.draw = function() {
+    drawStar(
+      ctx2,
+      this.x, this.y,
+      5,                 // 5 uçlu yıldız
+      dotRadius * 2,     // dış yarıçap
+      dotRadius,         // iç yarıçap
+      `rgb(${this.r},${this.g},${this.b})`,
+      1                  // opaklık (1 = tam görünür)
+    );
+  };
+
+  function loop() {
+    ctx2.clearRect(0, 0, w, h);
+    dots.forEach(d => d.draw());
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  function processImage() {
+    offCtx.clearRect(0, 0, imageW, imageH);
+    offCtx.drawImage(img, 0, 0, imageW, imageH);
+    const data = offCtx.getImageData(0, 0, imageW, imageH).data;
+    const pixels = [];
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i+3] !== 0) {
+        const idx = i / 4;
+        const x = idx % imageW, y = Math.floor(idx / imageW);
+        if (x % (dotRadius * 2 + 1) === 0 && y % (dotRadius * 2 + 1) === 0) {
+          pixels.push({ x, y, r: data[i], g: data[i+1], b: data[i+2] });
+        }
+      }
+    }
+    createDots(pixels);
+  }
+
+  function createDots(pixels) {
+    pixels.forEach(p => {
+      const startX = Math.random() * w;
+      const startY = Math.random() * h;
+      const dot = new Dot(startX, startY, p.r, p.g, p.b, p.x, p.y);
+      dots.push(dot);
+      const dur = 2 + Math.random() * 1;
+      const delay = 0.5 + Math.random() * 0.5;
+      TweenLite.to(dot, dur, {
+        x: dot.targetX,
+        y: dot.targetY,
+        ease: Cubic.easeInOut,
+        delay: delay
+      });
+    });
+  }
+
+  if (img.complete) processImage();
+  else img.onload = processImage;
+})();
+
+  // ******************** BURAYA KENDİ İSMİNİ VE SOYADINI YAZ ********************
+  // Örnek: const YOUR_NAME = "Umut Ablay";
+  const YOUR_NAME = "AD SOYADINIZ";
+  // **********************************************************************
+
+  // 1) Mola Listesi için gerekli sabitler
+  const SHEET_ID = "196H_TD0tCekLCIXBtGKbULWvQBa_WksX5iBkMbnNymM";
+  const SHEET_NAME_QUEUE = "Form Responses 1";
+  const BASE_URL_QUEUE =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_QUEUE)}&tqx=out:json`;
+
+  // 2) Uyarı Mesajı için gerekli sabitler
+  const SHEET_NAME_WARNING = "Uyarı/Bilgilendirme Mesajı";
+  const BASE_URL_WARNING =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_WARNING)}&tqx=out:json`;
+
+  // Önceki isim listesini ve son görülen ismi saklamak için
+  let previousNames = [];
+  let lastName = null;
+
+  // 5 saniyede bir mola listesini güncelleyen fonksiyon
+  async function refreshQueue() {
+    const loader = document.getElementById("loader");
+    const tbody = document.querySelector("#molaTable tbody");
+
+    // Loader'ı göster
+    loader.style.display = "block";
+
+    try {
+      // Google Sheets'ten mola verisini çek
+      const res = await fetch(`${BASE_URL_QUEUE}&cacheBuster=${Date.now()}`, {
+        cache: "no-store",
+      });
+      const txt = await res.text();
+      // JSON parse etmek için metnin içinden gerçek JSON objesini ayıklıyoruz
+      const json = JSON.parse(
+        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+      );
+      const rows = json.table.rows || [];
+
+      // Gelen satırları filtrele (başlık satırlarını atla)
+      const dataRows = rows.filter((r) => {
+        const t = r.c?.[0]?.v;
+        const n = r.c?.[1]?.v;
+        return (
+          t &&
+          n &&
+          n.toString().toLowerCase() !== "ad soyad" &&
+          t.toString().toLowerCase() !== "zaman damgası"
+        );
+      });
+
+      // Mevcut isim listesi
+      const currentNames = dataRows.map((r) => r.c[1].v);
+
+      // Debug (isteğe bağlı)
+      console.log("------- Yenileme (Queue) -------");
+      console.log("Önceki İsimler:", previousNames);
+      console.log("Mevcut İsimler:", currentNames);
+
+      // 1) Önceki listede olup, şu anda olmayan isimler için bildirim
+      previousNames.forEach((isim) => {
+        if (!currentNames.includes(isim)) {
+          lastName = isim; // Son görülen eksilen ismi güncelle
+          sendNotification(isim + ", mola sırası sende!");
+        }
+      });
+
+      // 2) Listede kimse yoksa (boş liste) ve lastName varsa, bildirim
+      //    ve ardından lastName'i sıfırla
+      if (currentNames.length === 0 && lastName) {
+        sendNotification(lastName + ", mola sırası sende!");
+        lastName = null; // Tekrar tekrar bildirim gitmesini engeller
+      }
+
+      // 3) Tabloya veri yazma
+      tbody.innerHTML = "";
+      if (dataRows.length > 0) {
+        dataRows.forEach((r, i) => {
+          const ts = r.c[0].f || r.c[0].v || "-";
+          const name = r.c[1].v || "-";
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
+      }
+
+      // Sonraki döngü için önceki isim listesini güncelle
+      previousNames = currentNames.slice();
+    } catch (e) {
+      console.error("Veri yüklenirken hata (Queue):", e);
+      tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
+    } finally {
+      // Loader'ı gizle
+      loader.style.display = "none";
+    }
+  }
+
+  // 5 saniyede bir “Uyarı/Bilgilendirme Mesajı”nı çeken fonksiyon
+  async function refreshWarning() {
+    try {
+      const res = await fetch(`${BASE_URL_WARNING}&cacheBuster=${Date.now()}`, {
+        cache: "no-store",
+      });
+      const txt = await res.text();
+      const json = JSON.parse(
+        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+      );
+      const rows = json.table.rows || [];
+
+      // Eğer satır varsa, ilk satırın ikinci sütununu (B1) al
+      if (rows.length > 0 && rows[0].c?.[1]?.v) {
+        const warningText = rows[0].c[1].v;
+        document.querySelector(".degisken").innerText = warningText;
+      } else {
+        document.querySelector(".degisken").innerText = "";
+      }
+    } catch (e) {
+      console.error("Uyarı metni alınırken hata:", e);
+      document.querySelector(".degisken").innerText = "";
+    }
+  }
+
+  // Bildirim iznini almak için fonksiyon
+  function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+      console.log("Notification API desteklenmiyor.");
+      return;
+    }
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission()
+        .then(permission => {
+          console.log("Bildirim izni durumu:", permission);
+        })
+        .catch(err => {
+          console.error("Bildirim izni alınamadı:", err);
+        });
+    } else {
+      console.log("Bildirim izni zaten verilmiş:", Notification.permission);
+    }
+  }
+
+  // Tarayıcı bildirimi ve ses oynatma
+  function sendNotification(message) {
+    if (Notification.permission === "granted") {
+      const notificationSound = new Audio(
+        "https://www.soundjay.com/button/beep-07.wav"
+      );
+      notificationSound.play().catch(() => {
+        // Ses çalamazsa sessizce devam et
+      });
+      new Notification(message);
+      console.log("Bildirim gönderildi:", message);
+    } else {
+      console.log("Bildirim izni verilmedi. Mesaj:", message);
+    }
+  }
+
+  // Tema geçişi için fonksiyon
+  function toggleTheme() {
+    document.documentElement.classList.toggle("dark-mode");
+    // Butonun içeriğini güncelle
+    const btn = document.getElementById("themeToggleBtn");
+    if (document.documentElement.classList.contains("dark-mode")) {
+      btn.textContent = "☀️ Açık";
+      btn.title = "Açık temaya geç";
+    } else {
+      btn.textContent = "🌙 Karanlık";
+      btn.title = "Karanlık temaya geç";
+    }
+  }
+
+  // Sayfa yüklendiğinde:
+  // 1) Bildirim izni istenir
+  // 2) Hem queue hem warning fonksiyonları ilk defa çağrılır
+  // 3) 5 saniyede bir her iki fonksiyon da yeniden çalışır
+  window.addEventListener("load", () => {
+    requestNotificationPermission();
+    // Tema düğmesine tıklama olayı
+    document
+      .getElementById("themeToggleBtn")
+      .addEventListener("click", toggleTheme);
+
+    // İlk yükleme
+    refreshQueue();
+    refreshWarning();
+    // Her 5 saniyede bir yenile
+    setInterval(() => {
+      refreshQueue();
+      refreshWarning();
+    }, 5000);
+ setTimeout(() => {
+    document
+      .querySelectorAll('#canvas-shapes, #canvas-stars')
+      .forEach(canvas => {
+        // 1) Opacity’yi 0’a çek
+        canvas.classList.add('fade-out');
+        // 2) 1s sonra tamamen DOM’dan da kaldır (isteğe bağlı)
+        setTimeout(() => canvas.remove(), 1000);
+      });
+  }, 3800);
+  });
+  </script>
+</body>
+</html>
