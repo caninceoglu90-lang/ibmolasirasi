@@ -842,19 +842,7 @@
     }
   }
 
-  // Tema geçişi için fonksiyon
-  function toggleTheme() {
-    document.documentElement.classList.toggle("dark-mode");
-    // Butonun içeriğini güncelle
-    const btn = document.getElementById("themeToggleBtn");
-    if (document.documentElement.classList.contains("dark-mode")) {
-      btn.textContent = "☀️ Açık";
-      btn.title = "Açık temaya geç";
-    } else {
-      btn.textContent = "🌙 Karanlık";
-      btn.title = "Karanlık temaya geç";
-    }
-  }
+  
 
   // Sayfa yüklendiğinde:
   // 1) Bildirim izni istenir
