@@ -86,6 +86,7 @@
       justify-content: center;
       position: relative; /* gradient-bg’i kapsayacak şekilde */
       color: var(--primary-color);
+      flex-direction: column;
     }
 
     /* ---------- GRADIENT BLOBS ARKA PLAN ---------- */
@@ -187,9 +188,19 @@
     }
 
     /* ---------- ORİJİNAL CARD STİLLERİ (BİRKAÇ KÜÇÜK EKLEMEYLE) ---------- */
+    .card {
+     margin-bottom: 0;
+     border-radius: 12px 12px 0px 0px;
+     }
+
+    .card2 {
+     margin-top: 0;
+     border-radius: 0px 0px 12px 12px;
+     }
+
+    
     .card , .card2 {
       background-color: var(--light-bg);
-      border-radius: var(--border-radius);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       width: 380px;
       max-width: 90%;
