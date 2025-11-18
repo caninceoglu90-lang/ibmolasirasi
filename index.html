@@ -10,11 +10,11 @@
     rel="stylesheet"
   />
   <style>
-#canvas-stars {
+    #canvas-stars {
       background: black;
       z-index: 2;
     }
-#canvas-stars, #canvas-shapes {
+    #canvas-stars, #canvas-shapes {
       position: fixed;
       top: 0;
       left: 0;
@@ -22,6 +22,14 @@
       height: 100%;
     }
     #canvas-shapes { z-index: 2; }
+
+    /* Canvas’lar için fade-out animasyonu */
+    #canvas-stars.fade-out,
+    #canvas-shapes.fade-out {
+      transition: opacity 1s ease;
+      opacity: 0;
+    }
+
     #toggleHint {
       color: #8f9ebb;
       font-size: 16px;
@@ -44,7 +52,7 @@
       --turknet-yellow: #f9a825;
       --font-family: "Inter", Helvetica, Arial, sans-serif;
       --border-radius: 12px;
-      --table-header-bg: #eaf4fc; /* Açık mavi ton */
+      --table-header-bg: #eaf4fc;
       --table-row-even: #f9f9f9;
       --text-muted: #555555;
 
@@ -84,7 +92,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative; /* gradient-bg’i kapsayacak şekilde */
+      position: relative;
       color: var(--primary-color);
       flex-direction: column;
     }
@@ -187,28 +195,25 @@
       opacity: 0.7;
     }
 
-    /* ---------- ORİJİNAL CARD STİLLERİ (BİRKAÇ KÜÇÜK EKLEMEYLE) ---------- */
+    /* ---------- CARD STİLLERİ ---------- */
     .card {
-     margin-bottom: 0 !important;
-     border-radius: 12px 12px 0px 0px;
-     }
-
+      margin-bottom: 0 !important;
+      border-radius: 12px 12px 0 0;
+    }
     .card2 {
-     margin-top: 0 !important;
-     border-radius: 0px 0px 12px 12px;
-     padding-top: 0 !important;
-     }
-
-    
-    .card , .card2 {
+      margin-top: 0 !important;
+      border-radius: 0 0 12px 12px;
+      padding-top: 0 !important;
+    }
+    .card, .card2 {
       background-color: var(--light-bg);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       width: 380px;
       max-width: 90%;
       padding: 24px;
       box-sizing: border-box;
-      position: relative; /* z-index tanımlamak için */
-      z-index: 1;        /* Gradient’in üstünde */
+      position: relative;
+      z-index: 1;
       margin: 2rem auto;
       color: var(--primary-color);
     }
@@ -228,7 +233,7 @@
       font-size: 1.6rem;
       font-weight: 600;
       color: var(--primary-color);
-      line-height: 1.6rem; /* Logo ile hizayı korumak için */
+      line-height: 1.6rem;
     }
     .title {
       font-size: 2.4rem;
@@ -239,8 +244,8 @@
       font-family: 'Montserrat';
     }
     .card2 .title {
-    margin-top: 0 !important;
-}
+      margin-top: 0 !important;
+    }
     .info-box {
       background: linear-gradient(90deg, rgb(255, 239, 254) 0%, rgb(255, 248, 255) 100%);
       border-radius: 8px;
@@ -267,6 +272,8 @@
       text-align: center;
       transition: background-color 0.2s ease;
       margin-bottom: 24px;
+      border: none;
+      cursor: pointer;
     }
     .btn-primary:hover {
       background: linear-gradient(90deg, rgb(255, 239, 254) 0%, rgb(255, 248, 255) 100%);
@@ -362,53 +369,172 @@
       color: rgb(78, 0, 82);
     }
     .card-footer .version {
-      opacity: 0.6;      /* “v.2” kısmı biraz silik */
+      opacity: 0.6;
       font-size: 0.85rem;
       margin-bottom: 4px;
     }
     .card-footer .copyright {
       font-size: 0.67rem;
-      opacity: 0.9;      /* Telif hakkı biraz daha net */
+      opacity: 0.9;
     }
 
-    /* ---------- TEMA DEĞİŞTİRME BUTONU (DAHA DİKKAT ÇEKİCİ) ---------- */
-    .theme-toggle {
-      position: absolute;
-      top: 16px;
-      right: 16px;
+    /* ---------- MOLA SAYAÇ STİLLERİ ---------- */
+    .timer-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-timer-start {
       background-color: rgb(78, 0, 82);
       color: #ffffff;
       border: none;
-      padding: 8px 12px;
-      font-size: 1rem;
-      border-radius: 8px;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      z-index: 2;
-      transition: background-color 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
     }
-    .theme-toggle:hover {
+    .btn-timer-start:hover:not(:disabled) {
       background: linear-gradient(90deg, rgb(255, 239, 254) 0%, rgb(255, 248, 255) 100%);
-      transform: translateY(-1px);
       color: rgb(78, 0, 82);
       border: 1px solid rgb(153, 108, 156);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     }
-    .theme-toggle:active {
-      transform: translateY(0);
+    .btn-timer-start:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .base-timer {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .base-timer__svg {
+      transform: scaleX(-1);
+    }
+    .base-timer__circle {
+      fill: none;
+      stroke: none;
+    }
+    .base-timer__path-elapsed {
+      stroke-width: 7px;
+      stroke: rgba(71, 30, 80, 0.2);
+    }
+    .base-timer__path-remaining {
+      stroke-width: 7px;
+      stroke-linecap: round;
+      transform: rotate(90deg);
+      transform-origin: center;
+      transition: 1s linear all;
+      fill-rule: nonzero;
+      stroke: currentColor;
+    }
+    .base-timer__path-remaining.green {
+      color: rgb(65, 184, 131);
+    }
+    .base-timer__path-remaining.orange {
+      color: #ff9800;
+    }
+    .base-timer__path-remaining.red {
+      color: #f44336;
+    }
+    .base-timer__label {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgb(78, 0, 82);
+    }
+
+    /* ---------- FORM MODAL (Mini Pencere) ---------- */
+    .form-modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+    .form-modal--hidden {
+      display: none;
+    }
+    .form-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+    .form-modal__content {
+      position: relative;
+      z-index: 1;
+      background-color: var(--light-bg);
+      border-radius: 16px;
+      width: min(480px, 95vw);
+      height: min(620px, 80vh);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .form-modal__header {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(71, 30, 80, 0.12);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      color: rgb(78, 0, 82);
+    }
+    .form-modal__close {
+      border: none;
+      background: transparent;
+      color: rgb(78, 0, 82);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 999px;
+      transition: background 0.15s ease;
+    }
+    .form-modal__close:hover {
+      background: rgba(71, 30, 80, 0.08);
+    }
+    .form-modal__body {
+      flex: 1;
+      padding: 0;
+    }
+    .form-modal__body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
     }
   </style>
 </head>
 <body>
-<!-- ⭐ Yıldız Arka Planı -->
+  <!-- ⭐ Yıldız Arka Planı -->
   <canvas id="canvas-stars"></canvas>
-  <!-- 🔄 Animasyon İpucu -->
-    <!-- ⚪ Nokta Partikülleri -->
+  <!-- ⚪ Nokta Partikülleri -->
   <canvas id="canvas-shapes"></canvas>
+
   <!-- Gizli Logo Görseli -->
   <img id="logoImg" src="https://ik.imagekit.io/labi7oyze/logo_image.png?updatedAt=1762089509729" crossOrigin="anonymous" alt="Logo" />
+
   <!-- ---------- GRADIENT BLOBS ARKA PLAN ---------- -->
   <div class="gradient-bg">
     <svg xmlns="http://www.w3.org/2000/svg">
@@ -435,44 +561,36 @@
     </div>
   </div>
 
-  <!-- ---------- MEVCUT CARD BÖLÜMÜ ---------- -->
+  <!-- ---------- MOLA SIRASI CARD ---------- -->
   <div class="card">
-    <!-- Tema Değiştirme Butonu (Daha belirgin ikon + metin) -->
-
-
-    <!-- Logo ve “TurkNet” Metni (Logotype olarak resim) -->
     <div class="logo">
-     <svg width="112" height="32" viewBox="0 0 112 32" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M26.8819 23.7083C24.6963 23.7083 23.3762 22.1348 23.3762 19.5121V10.1929H19.4073V19.7394C19.4073 24.5476 22.1873 27.3713 26.8819 27.3713C31.5765 27.3713 34.3304 24.5214 34.3304 19.7394V10.1929H30.3613V19.5121C30.3613 22.1348 29.0413 23.7083 26.8732 23.7083H26.8819ZM62.6642 10.1929H58.4679C58.1707 13.1565 55.5304 15.4382 51.8849 16.3911V4.63281H47.916V27.0129H51.8849V22.1348C51.8849 21.2955 52.4357 20.4912 53.205 20.1503L58.739 27.0129H63.3898L56.5534 18.4892C59.5607 16.6446 62.0261 13.751 62.6642 10.1929ZM36.0264 27.0129H39.9954V19.2848C39.9954 14.8874 42.3908 13.2876 46.3511 14.022V9.87815C44.2354 9.7645 42.452 9.90437 40.6074 10.7873C36.551 12.7019 36.0264 16.3736 36.0264 20.3338V27.0129ZM80.1664 18.7603C80.1664 23.7958 83.8119 27.3713 88.9174 27.3713C92.3619 27.3713 95.1856 25.754 96.6892 22.8778L93.2273 21.3042C92.1083 23.0789 90.8144 23.8832 89.0572 23.8832C86.5744 23.8832 84.6162 22.3358 84.3889 20.1678C85.7527 20.4825 87.2564 20.666 88.7863 20.666C91.3128 20.666 94.0753 20.1677 97.1264 19.1624C97.1701 18.6816 97.1701 18.498 97.1701 18.227C97.1701 13.375 93.6382 9.81695 88.8562 9.81695C84.0741 9.81695 80.1751 13.6198 80.1751 18.7515H80.1664V18.7603ZM84.3539 16.8894C84.6948 14.8612 86.6968 13.2439 88.8649 13.2439C91.033 13.2439 92.7203 14.7738 93.0088 16.8894C91.6887 17.2566 90.2987 17.4402 88.7688 17.4402C87.2389 17.4402 85.7876 17.2566 84.3451 16.8894H84.3539ZM71.3716 13.4974C73.5396 13.4974 74.8597 15.071 74.8597 17.6937V27.0129H78.8288V17.4664C78.8288 12.6844 76.0487 9.83443 71.3803 9.83443C66.7119 9.83443 63.9056 12.6582 63.9056 17.4664V27.0129H67.8746V17.6937C67.8746 15.071 69.1947 13.4974 71.3803 13.4974H71.3716ZM14.599 20.0366C14.599 21.8812 14.1444 23.7083 12.0025 23.7083C8.85526 23.7083 8.96894 19.853 8.96894 17.6238V13.8821H5V17.6238C5 22.4058 5.93535 27.3801 11.8102 27.3801C16.3474 27.3801 18.4194 24.4165 18.4194 20.0453H14.5903H14.599V20.0366ZM5.00864 4.63281V10.1929C5.00864 12.2211 6.53858 13.8821 8.42692 13.8821H14.9924V10.1929H8.97769V4.63281H5.00864ZM108.011 20.0366C108.011 21.8812 107.556 23.7083 105.414 23.7083C102.267 23.7083 102.38 19.853 102.38 17.6238V13.8821H98.4116V17.6238C98.4116 22.4058 99.3469 27.3801 105.222 27.3801C109.759 27.3801 111.831 24.4165 111.831 20.0453H108.002L108.011 20.0366ZM98.4203 4.63281V10.1929C98.4203 12.2211 99.9501 13.8821 101.838 13.8821H108.404V10.1929H102.389V4.63281H98.4203Z" fill="#471E50"></path> </svg>
-    
+      <svg width="112" height="32" viewBox="0 0 112 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M26.8819 23.7083C24.6963 23.7083 23.3762 22.1348 23.3762 19.5121V10.1929H19.4073V19.7394C19.4073 24.5476 22.1873 27.3713 26.8819 27.3713C31.5765 27.3713 34.3304 24.5214 34.3304 19.7394V10.1929H30.3613V19.5121C30.3613 22.1348 29.0413 23.7083 26.8732 23.7083H26.8819ZM62.6642 10.1929H58.4679C58.1707 13.1565 55.5304 15.4382 51.8849 16.3911V4.63281H47.916V27.0129H51.8849V22.1348C51.8849 21.2955 52.4357 20.4912 53.205 20.1503L58.739 27.0129H63.3898L56.5534 18.4892C59.5607 16.6446 62.0261 13.751 62.6642 10.1929ZM36.0264 27.0129H39.9954V19.2848C39.9954 14.8874 42.3908 13.2876 46.3511 14.022V9.87815C44.2354 9.7645 42.452 9.90437 40.6074 10.7873C36.551 12.7019 36.0264 16.3736 36.0264 20.3338V27.0129ZM80.1664 18.7603C80.1664 23.7958 83.8119 27.3713 88.9174 27.3713C92.3619 27.3713 95.1856 25.754 96.6892 22.8778L93.2273 21.3042C92.1083 23.0789 90.8144 23.8832 89.0572 23.8832C86.5744 23.8832 84.6162 22.3358 84.3889 20.1678C85.7527 20.4825 87.2564 20.666 88.7863 20.666C91.3128 20.666 94.0753 20.1677 97.1264 19.1624C97.1701 18.6816 97.1701 18.498 97.1701 18.227C97.1701 13.375 93.6382 9.81695 88.8562 9.81695C84.0741 9.81695 80.1751 13.6198 80.1751 18.7515H80.1664V18.7603ZM84.3539 16.8894C84.6948 14.8612 86.6968 13.2439 88.8649 13.2439C91.033 13.2439 92.7203 14.7738 93.0088 16.8894C91.6887 17.2566 90.2987 17.4402 88.7688 17.4402C87.2389 17.4402 85.7876 17.2566 84.3451 16.8894H84.3539ZM71.3716 13.4974C73.5396 13.4974 74.8597 15.071 74.8597 17.6937V27.0129H78.8288V17.4664C78.8288 12.6844 76.0487 9.83443 71.3803 9.83443C66.7119 9.83443 63.9056 12.6582 63.9056 17.4664V27.0129H67.8746V17.6937C67.8746 15.071 69.1947 13.4974 71.3803 13.4974H71.3716ZM14.599 20.0366C14.599 21.8812 14.1444 23.7083 12.0025 23.7083C8.85526 23.7083 8.96894 19.853 8.96894 17.6238V13.8821H5V17.6238C5 22.4058 5.93535 27.3801 11.8102 27.3801C16.3474 27.3801 18.4194 24.4165 18.4194 20.0453H14.5903H14.599V20.0366ZM5.00864 4.63281V10.1929C5.00864 12.2211 6.53858 13.8821 8.42692 13.8821H14.9924V10.1929H8.97769V4.63281H5.00864ZM108.011 20.0366C108.011 21.8812 107.556 23.7083 105.414 23.7083C102.267 23.7083 102.38 19.853 102.38 17.6238V13.8821H98.4116V17.6238C98.4116 22.4058 99.3469 27.3801 105.222 27.3801C109.759 27.3801 111.831 24.4165 111.831 20.0453H108.002L108.011 20.0366ZM98.4203 4.63281V10.1929C98.4203 12.2211 99.9501 13.8821 101.838 13.8821H108.404V10.1929H102.389V4.63281H98.4203Z" fill="#471E50"/>
+      </svg>
     </div>
 
-    <!-- Başlık: Mola Sırası -->
     <h1 class="title">Mola Sırası</h1>
 
-    <!-- Bilgi kutucuğu: her 5 saniyede güncellenecek -->
     <div class="info-box">
       Sıra bilgisi her <strong>5 saniyede</strong> güncellenir.
     </div>
     <div class="info-box">
       <p class="degisken"></p>
-    </div>  
+    </div>
 
-    <!-- “Mola Sırasına Katıl” Butonu -->
-    <a
-      href="https://forms.gle/bMmRf2wX3MPEyu3K7"
-      target="_blank" class="btn-primary"
-    >Sıraya Katıl</a>
+    <!-- Yeni: Aynı sekme içinde modal açan buton -->
+    <button type="button" class="btn-primary" id="openFormBtn">
+      Sıraya Katıl
+    </button>
 
-    <!-- Tablo ve 3D Loader -->
     <div class="table-wrapper">
-      <!-- 3 parçalı 3D Loader -->
-      <div class="loader" id="loader">
+      <div class="loader" id="loaderQueue">
         <div class="inner one"></div>
         <div class="inner two"></div>
         <div class="inner three"></div>
       </div>
 
-      <table id="molaTable">
+      <table id="molaTableQueue">
         <thead>
           <tr>
             <th>#</th>
@@ -487,440 +605,612 @@
         </tbody>
       </table>
     </div>
-
-  
   </div>
 
-  <div class="card2">
-    
-    <h1 class="title">Mola Sayacı</h1>
+  <!-- Google Form Mini Penceresi (Modal) -->
+  <div id="formModal" class="form-modal form-modal--hidden">
+    <div class="form-modal__backdrop"></div>
+    <div class="form-modal__content">
+      <div class="form-modal__header">
+        <span>Mola Sırası Formu</span>
+        <button type="button" class="form-modal__close" id="closeFormBtn">✕</button>
+      </div>
+      <div class="form-modal__body">
+        <iframe
+          src="https://forms.gle/bMmRf2wX3MPEyu3K7"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
 
+  <!-- ---------- SAYAÇ CARD ---------- -->
+  <div class="card2">
+    <h1 class="title">Sayaç</h1>
 
     <div class="info-box">
-      Başlat butonuna basıldığında 15 dakikalık süre dolunca otomatik Whatsapp bildirimi gönderir.
+      Mola sırasında adı listeden silinen her kişi için, karşısındaki mor butona basıldığında
+      <strong>15 dakikalık sayaç</strong> başlar; süre bitince bildirim gelir.
     </div>
 
-    <!-- Tablo ve 3D Loader -->
     <div class="table-wrapper">
-      <!-- 3 parçalı 3D Loader -->
-      <div class="loader" id="loader">
+      <div class="loader" id="loaderTimer">
         <div class="inner one"></div>
         <div class="inner two"></div>
         <div class="inner three"></div>
       </div>
 
-      <table id="molaTable">
+      <table id="timerTable">
         <thead>
           <tr>
             <th>#</th>
             <th>Zaman Damgası</th>
             <th>Ad Soyad</th>
-            <th>Sayac</th>
-            
+            <th>Sayaç</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td colspan="3" class="placeholder">Veri yüklenemedi.</td>
+          <tr class="placeholder-row">
+            <td colspan="4" class="placeholder">Henüz sayaç başlatılmadı.</td>
           </tr>
         </tbody>
       </table>
     </div>
-<div class="card-footer">
+
+    <div class="card-footer">
       <div class="version">v3</div>
       <div class="copyright">
         © 2025 Geliştiriciler: Erhan Demirci , Ahmet Can İnceoğlu , Umut Ablay
       </div>
     </div>
-  
   </div>
 
-  <!-- ---------- JavaScript Kısmı (DÜZELTİLMİŞ BİLDİRİM KODU ve TEMA GEÇİŞİ) ---------- -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenLite.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/easing/EasePack.min.js"></script>  
-<script>
-/* === 1) Yıldız Arka Planı === */
-     (function() {
-    const canvas = document.getElementById('canvas-stars');
-    const ctx = canvas.getContext('2d');
-    const dotRadius = 2;
-    const colors = ['#4e0052'];
+  <!-- ---------- JavaScript ---------- -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenLite.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/easing/EasePack.min.js"></script>
+  <script>
+    /* === 1) Yıldız Arka Planı === */
+    (function() {
+      const canvas = document.getElementById('canvas-stars');
+      const ctx = canvas.getContext('2d');
+      const dotRadius = 2;
+      const colors = ['#4e0052'];
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fillStyle, alpha) {
-      let rot = Math.PI / 2 * 3;
-      let x = cx;
-      let y = cy;
-      let step = Math.PI / spikes;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - outerRadius);
-      for (let i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
       }
-      ctx.closePath();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = fillStyle;
-      ctx.fill();
-      ctx.restore();
-    }
+      window.addEventListener('resize', resize);
+      resize();
 
-    class Star {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.r = dotRadius;
-        this.a = Math.random() * 0.5 + 0.3;
-        this.da = (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1);
-        this.color = colors[Math.floor(Math.random() * colors.length)];
+      function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fillStyle, alpha) {
+        let rot = Math.PI / 2 * 3;
+        let x = cx;
+        let y = cy;
+        let step = Math.PI / spikes;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerRadius);
+        for (let i = 0; i < spikes; i++) {
+          x = cx + Math.cos(rot) * outerRadius;
+          y = cy + Math.sin(rot) * outerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+        }
+        ctx.closePath();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = fillStyle;
+        ctx.fill();
+        ctx.restore();
       }
-      update() {
-        this.a += this.da;
-        if (this.a <= 0.1 || this.a >= 1) this.da *= -1;
-      }
-      draw() {
-        drawStar(ctx, this.x, this.y, 5, this.r * 2, this.r, this.color, this.a);
-      }
-    }
 
-    let stars = [];
-    function initStars() {
-      stars = [];
-      const count = Math.floor((window.innerWidth + window.innerHeight) / 8);
-      for (let i = 0; i < count; i++) stars.push(new Star());
-    }
-    initStars();
-    window.addEventListener('resize', initStars);
+      class Star {
+        constructor() { this.reset(); }
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.r = dotRadius;
+          this.a = Math.random() * 0.5 + 0.3;
+          this.da = (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1);
+          this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+          this.a += this.da;
+          if (this.a <= 0.1 || this.a >= 1) this.da *= -1;
+        }
+        draw() {
+          drawStar(ctx, this.x, this.y, 5, this.r * 2, this.r, this.color, this.a);
+        }
+      }
 
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stars.forEach(s => { s.update(); s.draw(); });
-      requestAnimationFrame(animate);
-    }
-    animate();
-  })();
+      let stars = [];
+      function initStars() {
+        stars = [];
+        const count = Math.floor((window.innerWidth + window.innerHeight) / 8);
+        for (let i = 0; i < count; i++) stars.push(new Star());
+      }
+      initStars();
+      window.addEventListener('resize', initStars);
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => { s.update(); s.draw(); });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
 
     /* === 2) Partiküllerden Logoya Birleşme === */
     (function() {
-  const stage = document.getElementById('canvas-shapes');
-  const ctx2 = stage.getContext('2d');
-  const img = document.getElementById('logoImg');
-  const imageW = 600, imageH = 126;
-  const dotRadius = 1.5;
-  let w, h;
+      const stage = document.getElementById('canvas-shapes');
+      const ctx2 = stage.getContext('2d');
+      const img = document.getElementById('logoImg');
+      const imageW = 600, imageH = 126;
+      const dotRadius = 1.5;
+      let w, h;
 
-  const offCanvas = document.createElement('canvas');
-  const offCtx = offCanvas.getContext('2d');
-  offCanvas.width = imageW;
-  offCanvas.height = imageH;
+      const offCanvas = document.createElement('canvas');
+      const offCtx = offCanvas.getContext('2d');
+      offCanvas.width = imageW;
+      offCanvas.height = imageH;
 
-  const dots = [];
+      const dots = [];
 
-  function resize() {
-    w = stage.width = window.innerWidth;
-    h = stage.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  // ★ Yıldız çizme fonksiyonu
-  function drawStar(ctx, cx, cy, spikes, outerR, innerR, fillStyle, alpha) {
-    let rot = Math.PI / 2 * 3;
-    const step = Math.PI / spikes;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - outerR);
-    for (let i = 0; i < spikes; i++) {
-      // dış uç
-      ctx.lineTo(
-        cx + Math.cos(rot) * outerR,
-        cy + Math.sin(rot) * outerR
-      );
-      rot += step;
-      // iç uç
-      ctx.lineTo(
-        cx + Math.cos(rot) * innerR,
-        cy + Math.sin(rot) * innerR
-      );
-      rot += step;
-    }
-    ctx.closePath();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // Dot sınıfı
-  function Dot(x, y, r, g, b, imgX, imgY) {
-    this.x = x; this.y = y;
-    this.r = r; this.g = g; this.b = b;
-    this.targetX = imgX + (w - imageW) / 2;
-    this.targetY = imgY + (h - imageH) / 2;
-  }
-  // ★ draw() artık yıldız çiziyor
-  Dot.prototype.draw = function() {
-    drawStar(
-      ctx2,
-      this.x, this.y,
-      5,                 // 5 uçlu yıldız
-      dotRadius * 2,     // dış yarıçap
-      dotRadius,         // iç yarıçap
-      `rgb(${this.r},${this.g},${this.b})`,
-      1                  // opaklık (1 = tam görünür)
-    );
-  };
-
-  function loop() {
-    ctx2.clearRect(0, 0, w, h);
-    dots.forEach(d => d.draw());
-    requestAnimationFrame(loop);
-  }
-  loop();
-
-  function processImage() {
-    offCtx.clearRect(0, 0, imageW, imageH);
-    offCtx.drawImage(img, 0, 0, imageW, imageH);
-    const data = offCtx.getImageData(0, 0, imageW, imageH).data;
-    const pixels = [];
-    for (let i = 0; i < data.length; i += 4) {
-      if (data[i+3] !== 0) {
-        const idx = i / 4;
-        const x = idx % imageW, y = Math.floor(idx / imageW);
-        if (x % (dotRadius * 2 + 1) === 0 && y % (dotRadius * 2 + 1) === 0) {
-          pixels.push({ x, y, r: data[i], g: data[i+1], b: data[i+2] });
-        }
+      function resize() {
+        w = stage.width = window.innerWidth;
+        h = stage.height = window.innerHeight;
       }
-    }
-    createDots(pixels);
-  }
+      window.addEventListener('resize', resize);
+      resize();
 
-  function createDots(pixels) {
-    pixels.forEach(p => {
-      const startX = Math.random() * w;
-      const startY = Math.random() * h;
-      const dot = new Dot(startX, startY, p.r, p.g, p.b, p.x, p.y);
-      dots.push(dot);
-      const dur = 2 + Math.random() * 1;
-      const delay = 0.5 + Math.random() * 0.5;
-      TweenLite.to(dot, dur, {
-        x: dot.targetX,
-        y: dot.targetY,
-        ease: Cubic.easeInOut,
-        delay: delay
-      });
-    });
-  }
+      function drawStar(ctx, cx, cy, spikes, outerR, innerR, fillStyle, alpha) {
+        let rot = Math.PI / 2 * 3;
+        const step = Math.PI / spikes;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerR);
+        for (let i = 0; i < spikes; i++) {
+          ctx.lineTo(
+            cx + Math.cos(rot) * outerR,
+            cy + Math.sin(rot) * outerR
+          );
+          rot += step;
+          ctx.lineTo(
+            cx + Math.cos(rot) * innerR,
+            cy + Math.sin(rot) * innerR
+          );
+          rot += step;
+        }
+        ctx.closePath();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = fillStyle;
+        ctx.fill();
+        ctx.restore();
+      }
 
-  if (img.complete) processImage();
-  else img.onload = processImage;
-})();
-
-  // ******************** BURAYA KENDİ İSMİNİ VE SOYADINI YAZ ********************
-  // Örnek: const YOUR_NAME = "Umut Ablay";
-  const YOUR_NAME = "AD SOYADINIZ";
-  // **********************************************************************
-
-  // 1) Mola Listesi için gerekli sabitler
-  const SHEET_ID = "1e76vIg2R_du1QcIabDJK7eqxEOV8lic3z3r9Vi9-dRQ";
-  const SHEET_NAME_QUEUE = "Form Responses 1";
-  const BASE_URL_QUEUE =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_QUEUE)}&tqx=out:json`;
-
-  // 2) Uyarı Mesajı için gerekli sabitler
-  const SHEET_NAME_WARNING = "Uyarı/Bilgilendirme Mesajı";
-  const BASE_URL_WARNING =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_WARNING)}&tqx=out:json`;
-
-  // Önceki isim listesini ve son görülen ismi saklamak için
-  let previousNames = [];
-  let lastName = null;
-
-  // 5 saniyede bir mola listesini güncelleyen fonksiyon
-  async function refreshQueue() {
-    const loader = document.getElementById("loader");
-    const tbody = document.querySelector("#molaTable tbody");
-
-    // Loader'ı göster
-    loader.style.display = "block";
-
-    try {
-      // Google Sheets'ten mola verisini çek
-      const res = await fetch(`${BASE_URL_QUEUE}&cacheBuster=${Date.now()}`, {
-        cache: "no-store",
-      });
-      const txt = await res.text();
-      // JSON parse etmek için metnin içinden gerçek JSON objesini ayıklıyoruz
-      const json = JSON.parse(
-        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
-      );
-      const rows = json.table.rows || [];
-
-      // Gelen satırları filtrele (başlık satırlarını atla)
-      const dataRows = rows.filter((r) => {
-        const t = r.c?.[0]?.v;
-        const n = r.c?.[1]?.v;
-        return (
-          t &&
-          n &&
-          n.toString().toLowerCase() !== "ad soyad" &&
-          t.toString().toLowerCase() !== "zaman damgası"
+      function Dot(x, y, r, g, b, imgX, imgY) {
+        this.x = x; this.y = y;
+        this.r = r; this.g = g; this.b = b;
+        this.targetX = imgX + (w - imageW) / 2;
+        this.targetY = imgY + (h - imageH) / 2;
+      }
+      Dot.prototype.draw = function() {
+        drawStar(
+          ctx2,
+          this.x, this.y,
+          5,
+          dotRadius * 2,
+          dotRadius,
+          `rgb(${this.r},${this.g},${this.b})`,
+          1
         );
-      });
+      };
 
-      // Mevcut isim listesi
-      const currentNames = dataRows.map((r) => r.c[1].v);
+      function loop() {
+        ctx2.clearRect(0, 0, w, h);
+        dots.forEach(d => d.draw());
+        requestAnimationFrame(loop);
+      }
+      loop();
 
-      // Debug (isteğe bağlı)
-      console.log("------- Yenileme (Queue) -------");
-      console.log("Önceki İsimler:", previousNames);
-      console.log("Mevcut İsimler:", currentNames);
-
-      // 1) Önceki listede olup, şu anda olmayan isimler için bildirim
-      previousNames.forEach((isim) => {
-        if (!currentNames.includes(isim)) {
-          lastName = isim; // Son görülen eksilen ismi güncelle
-          sendNotification(isim + ", mola sırası sende!");
+      function processImage() {
+        offCtx.clearRect(0, 0, imageW, imageH);
+        offCtx.drawImage(img, 0, 0, imageW, imageH);
+        const data = offCtx.getImageData(0, 0, imageW, imageH).data;
+        const pixels = [];
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i+3] !== 0) {
+            const idx = i / 4;
+            const x = idx % imageW, y = Math.floor(idx / imageW);
+            if (x % (dotRadius * 2 + 1) === 0 && y % (dotRadius * 2 + 1) === 0) {
+              pixels.push({ x, y, r: data[i], g: data[i+1], b: data[i+2] });
+            }
+          }
         }
-      });
-
-      // 2) Listede kimse yoksa (boş liste) ve lastName varsa, bildirim
-      //    ve ardından lastName'i sıfırla
-      if (currentNames.length === 0 && lastName) {
-        sendNotification(lastName + ", mola sırası sende!");
-        lastName = null; // Tekrar tekrar bildirim gitmesini engeller
+        createDots(pixels);
       }
 
-      // 3) Tabloya veri yazma
-      tbody.innerHTML = "";
-      if (dataRows.length > 0) {
-        dataRows.forEach((r, i) => {
-          const ts = r.c[0].f || r.c[0].v || "-";
-          const name = r.c[1].v || "-";
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
-          tbody.appendChild(tr);
+      function createDots(pixels) {
+        pixels.forEach(p => {
+          const startX = Math.random() * w;
+          const startY = Math.random() * h;
+          const dot = new Dot(startX, startY, p.r, p.g, p.b, p.x, p.y);
+          dots.push(dot);
+          const dur = 2 + Math.random() * 1;
+          const delay = 0.5 + Math.random() * 0.5;
+          TweenLite.to(dot, dur, {
+            x: dot.targetX,
+            y: dot.targetY,
+            ease: Cubic.easeInOut,
+            delay: delay
+          });
         });
-      } else {
-        tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
       }
 
-      // Sonraki döngü için önceki isim listesini güncelle
-      previousNames = currentNames.slice();
-    } catch (e) {
-      console.error("Veri yüklenirken hata (Queue):", e);
-      tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
-    } finally {
-      // Loader'ı gizle
-      loader.style.display = "none";
+      if (img.complete) processImage();
+      else img.onload = processImage;
+    })();
+
+    // İsteğe bağlı: isim
+    const YOUR_NAME = "AD SOYADINIZ";
+
+    // Google Sheets sabitleri
+    const SHEET_ID = "1e76vIg2R_du1QcIabDJK7eqxEOV8lic3z3r9Vi9-dRQ";
+    const SHEET_NAME_QUEUE = "Form Responses 1";
+    const BASE_URL_QUEUE =
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_QUEUE)}&tqx=out:json`;
+
+    const SHEET_NAME_WARNING = "Uyarı/Bilgilendirme Mesajı";
+    const BASE_URL_WARNING =
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_WARNING)}&tqx=out:json`;
+
+    // Önceki isim listesi
+    let previousNames = [];
+
+    // Sayaç sistemi sabitleri
+    const timers = {};
+    const BREAK_SECONDS = 15 * 60; // 15 dakika
+    const FULL_DASH_ARRAY = 283;
+    const WARNING_THRESHOLD = 5 * 60;
+    const ALERT_THRESHOLD = 60;
+
+    const COLOR_CODES = {
+      info: {
+        color: "green"
+      },
+      warning: {
+        color: "orange",
+        threshold: WARNING_THRESHOLD
+      },
+      alert: {
+        color: "red",
+        threshold: ALERT_THRESHOLD
+      }
+    };
+
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60);
+      let seconds = totalSeconds % 60;
+      if (seconds < 10) seconds = `0${seconds}`;
+      return `${minutes}:${seconds}`;
     }
+
+    function calculateTimeFraction(timer) {
+      const rawTimeFraction = timer.timeLeft / timer.timeLimit;
+      return rawTimeFraction - (1 / timer.timeLimit) * (1 - rawTimeFraction);
+    }
+
+    function setCircleDasharray(timer) {
+      const circleDasharray = `${Math.round(
+        calculateTimeFraction(timer) * FULL_DASH_ARRAY
+      )} ${FULL_DASH_ARRAY}`;
+      if (timer.pathEl) {
+        timer.pathEl.setAttribute("stroke-dasharray", circleDasharray);
+      }
+    }
+
+    function setRemainingPathColor(timer) {
+      const { alert, warning, info } = COLOR_CODES;
+      const path = timer.pathEl;
+      if (!path) return;
+
+      path.classList.remove(info.color, warning.color, alert.color);
+
+      if (timer.timeLeft <= alert.threshold) {
+        path.classList.add(alert.color);
+      } else if (timer.timeLeft <= warning.threshold) {
+        path.classList.add(warning.color);
+      } else {
+        path.classList.add(info.color);
+      }
+    }
+
+    function updateTimerUi(timer) {
+      if (timer.labelEl) {
+        timer.labelEl.textContent = formatTime(timer.timeLeft);
+      }
+      setRemainingPathColor(timer);
+      setCircleDasharray(timer);
+    }
+
+    function startTimer(timerId) {
+  const timer = timers[timerId];
+  if (!timer || timer.intervalId) return;
+
+  // Sayaç görünür olsun
+  timer.baseTimerEl.style.display = "inline-flex";
+  // Başlat butonu tamamen kaybolsun
+  if (timer.startButton) {
+    timer.startButton.style.display = "none";
   }
 
-  // 5 saniyede bir “Uyarı/Bilgilendirme Mesajı”nı çeken fonksiyon
-  async function refreshWarning() {
-    try {
-      const res = await fetch(`${BASE_URL_WARNING}&cacheBuster=${Date.now()}`, {
-        cache: "no-store",
-      });
-      const txt = await res.text();
-      const json = JSON.parse(
-        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
-      );
-      const rows = json.table.rows || [];
+  timer.timeLeft = timer.timeLimit;
+  updateTimerUi(timer);
 
-      // Eğer satır varsa, ilk satırın ikinci sütununu (B1) al
-      if (rows.length > 0 && rows[0].c?.[1]?.v) {
-        const warningText = rows[0].c[1].v;
-        document.querySelector(".degisken").innerText = warningText;
-      } else {
+  timer.intervalId = setInterval(() => {
+    timer.timeLeft -= 1;
+    if (timer.timeLeft < 0) timer.timeLeft = 0;
+
+    updateTimerUi(timer);
+
+    if (timer.timeLeft === 0) {
+      clearInterval(timer.intervalId);
+      timer.intervalId = null;
+      sendNotification(timer.name + " için 15 dakikalık mola süresi doldu.");
+    }
+  }, 1000);
+}
+
+
+    function addTimerEntry(name) {
+      const tbody = document.querySelector("#timerTable tbody");
+      if (!tbody) return;
+
+      const placeholderRow = tbody.querySelector(".placeholder-row");
+      if (placeholderRow) {
+        placeholderRow.remove();
+      }
+
+      const rowIndex = tbody.querySelectorAll("tr").length + 1;
+      const timerId = "t-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+      const pathId = "base-timer-path-" + timerId;
+      const labelId = "base-timer-label-" + timerId;
+
+      const tr = document.createElement("tr");
+      tr.dataset.timerId = timerId;
+      tr.dataset.name = name;
+
+      tr.innerHTML = `
+        <td>${rowIndex}</td>
+        <td>${new Date().toLocaleString("tr-TR")}</td>
+        <td>${name}</td>
+        <td>
+          <div class="timer-cell">
+            <button type="button" class="btn-timer-start">Başlat</button>
+            <div class="base-timer" style="display:none;">
+              <svg class="base-timer__svg" viewBox="0 0 100 100">
+                <g class="base-timer__circle">
+                  <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+                  <path
+                    id="${pathId}"
+                    stroke-dasharray="${FULL_DASH_ARRAY}"
+                    class="base-timer__path-remaining green"
+                    d="
+                      M 50, 50
+                      m -45, 0
+                      a 45,45 0 1,0 90,0
+                      a 45,45 0 1,0 -90,0
+                    "
+                  ></path>
+                </g>
+              </svg>
+              <span id="${labelId}" class="base-timer__label">${formatTime(
+                BREAK_SECONDS
+              )}</span>
+            </div>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      const startButton = tr.querySelector(".btn-timer-start");
+      const baseTimerEl = tr.querySelector(".base-timer");
+      const labelEl = document.getElementById(labelId);
+      const pathEl = document.getElementById(pathId);
+
+      timers[timerId] = {
+        name,
+        timeLimit: BREAK_SECONDS,
+        timeLeft: BREAK_SECONDS,
+        intervalId: null,
+        labelEl,
+        pathEl,
+        baseTimerEl,
+        startButton
+      };
+
+      startButton.addEventListener("click", () => {
+        startTimer(timerId);
+      });
+    }
+
+    // Console’dan test için:
+    window.addTimerEntry = addTimerEntry;
+    window.startTimer = startTimer;
+
+    // Mola sırası listesini yenileyen fonksiyon
+    async function refreshQueue() {
+      const loader = document.getElementById("loaderQueue");
+      const tbody = document.querySelector("#molaTableQueue tbody");
+
+      if (loader) loader.style.display = "block";
+
+      try {
+        const res = await fetch(`${BASE_URL_QUEUE}&cacheBuster=${Date.now()}`, {
+          cache: "no-store",
+        });
+        const txt = await res.text();
+        const json = JSON.parse(
+          txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+        );
+        const rows = json.table.rows || [];
+
+        const dataRows = rows.filter((r) => {
+          const t = r.c?.[0]?.v;
+          const n = r.c?.[1]?.v;
+          return (
+            t &&
+            n &&
+            n.toString().toLowerCase() !== "ad soyad" &&
+            t.toString().toLowerCase() !== "zaman damgası"
+          );
+        });
+
+        const currentNames = dataRows.map((r) => r.c[1].v);
+
+        // Sıradan çıkan isimler
+        const leavingNames = previousNames.filter(
+          (name) => !currentNames.includes(name)
+        );
+
+        leavingNames.forEach((isim) => {
+          sendNotification(isim + ", mola sırası sende!");
+          addTimerEntry(isim);
+        });
+
+        tbody.innerHTML = "";
+        if (dataRows.length > 0) {
+          dataRows.forEach((r, i) => {
+            const ts = r.c[0].f || r.c[0].v || "-";
+            const name = r.c[1].v || "-";
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
+        }
+
+        previousNames = currentNames.slice();
+      } catch (e) {
+        console.error("Veri yüklenirken hata (Queue):", e);
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
+        }
+      } finally {
+        if (loader) loader.style.display = "none";
+      }
+    }
+
+    // Uyarı metnini çeken fonksiyon
+    async function refreshWarning() {
+      try {
+        const res = await fetch(`${BASE_URL_WARNING}&cacheBuster=${Date.now()}`, {
+          cache: "no-store",
+        });
+        const txt = await res.text();
+        const json = JSON.parse(
+          txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+        );
+        const rows = json.table.rows || [];
+
+        if (rows.length > 0 && rows[0].c?.[1]?.v) {
+          const warningText = rows[0].c[1].v;
+          document.querySelector(".degisken").innerText = warningText;
+        } else {
+          document.querySelector(".degisken").innerText = "";
+        }
+      } catch (e) {
+        console.error("Uyarı metni alınırken hata:", e);
         document.querySelector(".degisken").innerText = "";
       }
-    } catch (e) {
-      console.error("Uyarı metni alınırken hata:", e);
-      document.querySelector(".degisken").innerText = "";
     }
-  }
 
-  // Bildirim iznini almak için fonksiyon
-  function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-      console.log("Notification API desteklenmiyor.");
-      return;
+    // Bildirim izni
+    function requestNotificationPermission() {
+      if (!("Notification" in window)) {
+        console.log("Notification API desteklenmiyor.");
+        return;
+      }
+      if (Notification.permission !== "granted") {
+        Notification.requestPermission()
+          .then(permission => {
+            console.log("Bildirim izni durumu:", permission);
+          })
+          .catch(err => {
+            console.error("Bildirim izni alınamadı:", err);
+          });
+      } else {
+        console.log("Bildirim izni zaten verilmiş:", Notification.permission);
+      }
     }
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission()
-        .then(permission => {
-          console.log("Bildirim izni durumu:", permission);
-        })
-        .catch(err => {
-          console.error("Bildirim izni alınamadı:", err);
+
+    // Tarayıcı bildirimi + ses
+    function sendNotification(message) {
+      if (Notification.permission === "granted") {
+        const notificationSound = new Audio(
+          "https://www.soundjay.com/button/beep-07.wav"
+        );
+        notificationSound.play().catch(() => {});
+        new Notification(message);
+        console.log("Bildirim gönderildi:", message);
+      } else {
+        console.log("Bildirim izni verilmedi. Mesaj:", message);
+      }
+    }
+
+    // Sayfa yüklendiğinde
+    window.addEventListener("load", () => {
+      requestNotificationPermission();
+
+      // Google Form modal kontrolü
+      const openFormBtn = document.getElementById("openFormBtn");
+      const formModal   = document.getElementById("formModal");
+      const closeFormBtn = document.getElementById("closeFormBtn");
+
+      if (openFormBtn && formModal) {
+        openFormBtn.addEventListener("click", () => {
+          formModal.classList.remove("form-modal--hidden");
         });
-    } else {
-      console.log("Bildirim izni zaten verilmiş:", Notification.permission);
-    }
-  }
+      }
 
-  // Tarayıcı bildirimi ve ses oynatma
-  function sendNotification(message) {
-    if (Notification.permission === "granted") {
-      const notificationSound = new Audio(
-        "https://www.soundjay.com/button/beep-07.wav"
-      );
-      notificationSound.play().catch(() => {
-        // Ses çalamazsa sessizce devam et
-      });
-      new Notification(message);
-      console.log("Bildirim gönderildi:", message);
-    } else {
-      console.log("Bildirim izni verilmedi. Mesaj:", message);
-    }
-  }
+      if (closeFormBtn && formModal) {
+        closeFormBtn.addEventListener("click", () => {
+          formModal.classList.add("form-modal--hidden");
+        });
+      }
 
-  
+      if (formModal) {
+        const backdrop = formModal.querySelector(".form-modal__backdrop");
+        if (backdrop) {
+          backdrop.addEventListener("click", () => {
+            formModal.classList.add("form-modal--hidden");
+          });
+        }
+      }
 
-  // Sayfa yüklendiğinde:
-  // 1) Bildirim izni istenir
-  // 2) Hem queue hem warning fonksiyonları ilk defa çağrılır
-  // 3) 5 saniyede bir her iki fonksiyon da yeniden çalışır
-  window.addEventListener("load", () => {
-    requestNotificationPermission();
-    // Tema düğmesine tıklama olayı
-    document
-      .getElementById("themeToggleBtn")
-
-    // İlk yükleme
-    refreshQueue();
-    refreshWarning();
-    // Her 5 saniyede bir yenile
-    setInterval(() => {
       refreshQueue();
       refreshWarning();
-    }, 5000);
- setTimeout(() => {
-    document
-      .querySelectorAll('#canvas-shapes, #canvas-stars')
-      .forEach(canvas => {
-        // 1) Opacity’yi 0’a çek
-        canvas.classList.add('fade-out');
-        // 2) 1s sonra tamamen DOM’dan da kaldır (isteğe bağlı)
-        setTimeout(() => canvas.remove(), 1000);
-      });
-  }, 3800);
-  });
+
+      setInterval(() => {
+        refreshQueue();
+        refreshWarning();
+      }, 5000);
+
+      setTimeout(() => {
+        document
+          .querySelectorAll('#canvas-shapes, #canvas-stars')
+          .forEach(canvas => {
+            canvas.classList.add('fade-out');
+            setTimeout(() => canvas.remove(), 1000);
+          });
+      }, 3800);
+    });
   </script>
 </body>
 </html>
