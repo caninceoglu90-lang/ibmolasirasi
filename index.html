@@ -1046,7 +1046,7 @@ function runTimerInterval(timer) {
 async function refreshTimersFromServer() {
   const loader = document.getElementById("loaderTimer");
   const tbody = document.querySelector("#timerTable tbody");
-  if (!tbody || !TIMERS_API_URL || TIMERS_API_URL === "BURAYA_WEB_APP_URL") {
+  if (!tbody || !TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbzaqb4sX7bjeJGBUwkFsZY2959N9Iur7W_OD8NY-5XKCI-_UlgVqTNpp6aXJmqR_h7m/exec") {
     return;
   }
 
