@@ -670,547 +670,720 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenLite.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/easing/EasePack.min.js"></script>
   <script>
-    /* === 1) Yıldız Arka Planı === */
-    (function() {
-      const canvas = document.getElementById('canvas-stars');
-      const ctx = canvas.getContext('2d');
-      const dotRadius = 2;
-      const colors = ['#4e0052'];
+    
+  /* === 1) Yıldız Arka Planı === */
+  (function() {
+    const canvas = document.getElementById('canvas-stars');
+    const ctx = canvas.getContext('2d');
+    const dotRadius = 2;
+    const colors = ['#4e0052'];
 
-      function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fillStyle, alpha) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      let step = Math.PI / spikes;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
       }
-      window.addEventListener('resize', resize);
-      resize();
+      ctx.closePath();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = fillStyle;
+      ctx.fill();
+      ctx.restore();
+    }
 
-      function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fillStyle, alpha) {
-        let rot = Math.PI / 2 * 3;
-        let x = cx;
-        let y = cy;
-        let step = Math.PI / spikes;
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(cx, cy - outerRadius);
-        for (let i = 0; i < spikes; i++) {
-          x = cx + Math.cos(rot) * outerRadius;
-          y = cy + Math.sin(rot) * outerRadius;
-          ctx.lineTo(x, y);
-          rot += step;
-          x = cx + Math.cos(rot) * innerRadius;
-          y = cy + Math.sin(rot) * innerRadius;
-          ctx.lineTo(x, y);
-          rot += step;
-        }
-        ctx.closePath();
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = fillStyle;
-        ctx.fill();
-        ctx.restore();
+    class Star {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.r = dotRadius;
+        this.a = Math.random() * 0.5 + 0.3;
+        this.da = (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1);
+        this.color = colors[Math.floor(Math.random() * colors.length)];
       }
-
-      class Star {
-        constructor() { this.reset(); }
-        reset() {
-          this.x = Math.random() * canvas.width;
-          this.y = Math.random() * canvas.height;
-          this.r = dotRadius;
-          this.a = Math.random() * 0.5 + 0.3;
-          this.da = (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1);
-          this.color = colors[Math.floor(Math.random() * colors.length)];
-        }
-        update() {
-          this.a += this.da;
-          if (this.a <= 0.1 || this.a >= 1) this.da *= -1;
-        }
-        draw() {
-          drawStar(ctx, this.x, this.y, 5, this.r * 2, this.r, this.color, this.a);
-        }
+      update() {
+        this.a += this.da;
+        if (this.a <= 0.1 || this.a >= 1) this.da *= -1;
       }
-
-      let stars = [];
-      function initStars() {
-        stars = [];
-        const count = Math.floor((window.innerWidth + window.innerHeight) / 8);
-        for (let i = 0; i < count; i++) stars.push(new Star());
+      draw() {
+        drawStar(ctx, this.x, this.y, 5, this.r * 2, this.r, this.color, this.a);
       }
-      initStars();
-      window.addEventListener('resize', initStars);
+    }
 
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        stars.forEach(s => { s.update(); s.draw(); });
-        requestAnimationFrame(animate);
-      }
-      animate();
-    })();
+    let stars = [];
+    function initStars() {
+      stars = [];
+      const count = Math.floor((window.innerWidth + window.innerHeight) / 8);
+      for (let i = 0; i < count; i++) stars.push(new Star());
+    }
+    initStars();
+    window.addEventListener('resize', initStars);
 
-    /* === 2) Partiküllerden Logoya Birleşme === */
-    (function() {
-      const stage = document.getElementById('canvas-shapes');
-      const ctx2 = stage.getContext('2d');
-      const img = document.getElementById('logoImg');
-      const imageW = 600, imageH = 126;
-      const dotRadius = 1.5;
-      let w, h;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => { s.update(); s.draw(); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
 
-      const offCanvas = document.createElement('canvas');
-      const offCtx = offCanvas.getContext('2d');
-      offCanvas.width = imageW;
-      offCanvas.height = imageH;
+  /* === 2) Partiküllerden Logoya Birleşme === */
+  (function() {
+    const stage = document.getElementById('canvas-shapes');
+    const ctx2 = stage.getContext('2d');
+    const img = document.getElementById('logoImg');
+    const imageW = 600, imageH = 126;
+    const dotRadius = 1.5;
+    let w, h;
 
-      const dots = [];
+    const offCanvas = document.createElement('canvas');
+    const offCtx = offCanvas.getContext('2d');
+    offCanvas.width = imageW;
+    offCanvas.height = imageH;
 
-      function resize() {
-        w = stage.width = window.innerWidth;
-        h = stage.height = window.innerHeight;
-      }
-      window.addEventListener('resize', resize);
-      resize();
+    const dots = [];
 
-      function drawStar(ctx, cx, cy, spikes, outerR, innerR, fillStyle, alpha) {
-        let rot = Math.PI / 2 * 3;
-        const step = Math.PI / spikes;
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(cx, cy - outerR);
-        for (let i = 0; i < spikes; i++) {
-          ctx.lineTo(
-            cx + Math.cos(rot) * outerR,
-            cy + Math.sin(rot) * outerR
-          );
-          rot += step;
-          ctx.lineTo(
-            cx + Math.cos(rot) * innerR,
-            cy + Math.sin(rot) * innerR
-          );
-          rot += step;
-        }
-        ctx.closePath();
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = fillStyle;
-        ctx.fill();
-        ctx.restore();
-      }
+    function resize() {
+      w = stage.width = window.innerWidth;
+      h = stage.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-      function Dot(x, y, r, g, b, imgX, imgY) {
-        this.x = x; this.y = y;
-        this.r = r; this.g = g; this.b = b;
-        this.targetX = imgX + (w - imageW) / 2;
-        this.targetY = imgY + (h - imageH) / 2;
-      }
-      Dot.prototype.draw = function() {
-        drawStar(
-          ctx2,
-          this.x, this.y,
-          5,
-          dotRadius * 2,
-          dotRadius,
-          `rgb(${this.r},${this.g},${this.b})`,
-          1
+    function drawStar(ctx, cx, cy, spikes, outerR, innerR, fillStyle, alpha) {
+      let rot = Math.PI / 2 * 3;
+      const step = Math.PI / spikes;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerR);
+      for (let i = 0; i < spikes; i++) {
+        ctx.lineTo(
+          cx + Math.cos(rot) * outerR,
+          cy + Math.sin(rot) * outerR
         );
-      };
-
-      function loop() {
-        ctx2.clearRect(0, 0, w, h);
-        dots.forEach(d => d.draw());
-        requestAnimationFrame(loop);
+        rot += step;
+        ctx.lineTo(
+          cx + Math.cos(rot) * innerR,
+          cy + Math.sin(rot) * innerR
+        );
+        rot += step;
       }
-      loop();
+      ctx.closePath();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = fillStyle;
+      ctx.fill();
+      ctx.restore();
+    }
 
-      function processImage() {
-        offCtx.clearRect(0, 0, imageW, imageH);
-        offCtx.drawImage(img, 0, 0, imageW, imageH);
-        const data = offCtx.getImageData(0, 0, imageW, imageH).data;
-        const pixels = [];
-        for (let i = 0; i < data.length; i += 4) {
-          if (data[i+3] !== 0) {
-            const idx = i / 4;
-            const x = idx % imageW, y = Math.floor(idx / imageW);
-            if (x % (dotRadius * 2 + 1) === 0 && y % (dotRadius * 2 + 1) === 0) {
-              pixels.push({ x, y, r: data[i], g: data[i+1], b: data[i+2] });
-            }
-          }
-        }
-        createDots(pixels);
-      }
-
-      function createDots(pixels) {
-        pixels.forEach(p => {
-          const startX = Math.random() * w;
-          const startY = Math.random() * h;
-          const dot = new Dot(startX, startY, p.r, p.g, p.b, p.x, p.y);
-          dots.push(dot);
-          const dur = 2 + Math.random() * 1;
-          const delay = 0.5 + Math.random() * 0.5;
-          TweenLite.to(dot, dur, {
-            x: dot.targetX,
-            y: dot.targetY,
-            ease: Cubic.easeInOut,
-            delay: delay
-          });
-        });
-      }
-
-      if (img.complete) processImage();
-      else img.onload = processImage;
-    })();
-
-    // İsteğe bağlı: isim
-    const YOUR_NAME = "AD SOYADINIZ";
-
-    // Google Sheets sabitleri
-    const SHEET_ID = "1e76vIg2R_du1QcIabDJK7eqxEOV8lic3z3r9Vi9-dRQ";
-    const SHEET_NAME_QUEUE = "Form Responses 1";
-    const BASE_URL_QUEUE =
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_QUEUE)}&tqx=out:json`;
-
-    const SHEET_NAME_WARNING = "Uyarı/Bilgilendirme Mesajı";
-    const BASE_URL_WARNING =
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_WARNING)}&tqx=out:json`;
-
-    // Önceki isim listesi
-    let previousNames = [];
-
-    // Sayaç sistemi sabitleri
-    const timers = {};
-    const BREAK_SECONDS = 15 * 60; // 15 dakika
-    const FULL_DASH_ARRAY = 283;
-    const WARNING_THRESHOLD = 5 * 60;
-    const ALERT_THRESHOLD = 60;
-
-    const COLOR_CODES = {
-      info: {
-        color: "green"
-      },
-      warning: {
-        color: "orange",
-        threshold: WARNING_THRESHOLD
-      },
-      alert: {
-        color: "red",
-        threshold: ALERT_THRESHOLD
-      }
+    function Dot(x, y, r, g, b, imgX, imgY) {
+      this.x = x; this.y = y;
+      this.r = r; this.g = g; this.b = b;
+      this.targetX = imgX + (w - imageW) / 2;
+      this.targetY = imgY + (h - imageH) / 2;
+    }
+    Dot.prototype.draw = function() {
+      drawStar(
+        ctx2,
+        this.x, this.y,
+        5,
+        dotRadius * 2,
+        dotRadius,
+        `rgb(${this.r},${this.g},${this.b})`,
+        1
+      );
     };
 
-    function formatTime(totalSeconds) {
-      const minutes = Math.floor(totalSeconds / 60);
-      let seconds = totalSeconds % 60;
-      if (seconds < 10) seconds = `0${seconds}`;
-      return `${minutes}:${seconds}`;
+    function loop() {
+      ctx2.clearRect(0, 0, w, h);
+      dots.forEach(d => d.draw());
+      requestAnimationFrame(loop);
     }
+    loop();
 
-    function calculateTimeFraction(timer) {
-      const rawTimeFraction = timer.timeLeft / timer.timeLimit;
-      return rawTimeFraction - (1 / timer.timeLimit) * (1 - rawTimeFraction);
-    }
-
-    function setCircleDasharray(timer) {
-      const circleDasharray = `${Math.round(
-        calculateTimeFraction(timer) * FULL_DASH_ARRAY
-      )} ${FULL_DASH_ARRAY}`;
-      if (timer.pathEl) {
-        timer.pathEl.setAttribute("stroke-dasharray", circleDasharray);
+    function processImage() {
+      offCtx.clearRect(0, 0, imageW, imageH);
+      offCtx.drawImage(img, 0, 0, imageW, imageH);
+      const data = offCtx.getImageData(0, 0, imageW, imageH).data;
+      const pixels = [];
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i+3] !== 0) {
+          const idx = i / 4;
+          const x = idx % imageW, y = Math.floor(idx / imageW);
+          if (x % (dotRadius * 2 + 1) === 0 && y % (dotRadius * 2 + 1) === 0) {
+            pixels.push({ x, y, r: data[i], g: data[i+1], b: data[i+2] });
+          }
+        }
       }
+      createDots(pixels);
     }
 
-    function setRemainingPathColor(timer) {
-      const { alert, warning, info } = COLOR_CODES;
-      const path = timer.pathEl;
-      if (!path) return;
-
-      path.classList.remove(info.color, warning.color, alert.color);
-
-      if (timer.timeLeft <= alert.threshold) {
-        path.classList.add(alert.color);
-      } else if (timer.timeLeft <= warning.threshold) {
-        path.classList.add(warning.color);
-      } else {
-        path.classList.add(info.color);
-      }
+    function createDots(pixels) {
+      pixels.forEach(p => {
+        const startX = Math.random() * w;
+        const startY = Math.random() * h;
+        const dot = new Dot(startX, startY, p.r, p.g, p.b, p.x, p.y);
+        dots.push(dot);
+        const dur = 2 + Math.random() * 1;
+        const delay = 0.5 + Math.random() * 0.5;
+        TweenLite.to(dot, dur, {
+          x: dot.targetX,
+          y: dot.targetY,
+          ease: Cubic.easeInOut,
+          delay: delay
+        });
+      });
     }
 
-    function updateTimerUi(timer) {
-      if (timer.labelEl) {
-        timer.labelEl.textContent = formatTime(timer.timeLeft);
-      }
-      setRemainingPathColor(timer);
-      setCircleDasharray(timer);
+    if (img.complete) processImage();
+    else img.onload = processImage;
+  })();
+
+  // İsteğe bağlı: isim
+  const YOUR_NAME = "AD SOYADINIZ";
+
+  // Google Sheets sabitleri
+  const SHEET_ID = "1e76vIg2R_du1QcIabDJK7eqxEOV8lic3z3r9Vi9-dRQ";
+  const SHEET_NAME_QUEUE = "Form Responses 1";
+  const BASE_URL_QUEUE =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_QUEUE)}&tqx=out:json`;
+
+  const SHEET_NAME_WARNING = "Uyarı/Bilgilendirme Mesajı";
+  const BASE_URL_WARNING =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_WARNING)}&tqx=out:json`;
+
+  // Önceki isim listesi (mola sırası sheet'i için)
+  let previousNames = [];
+
+  // Sayaç sistemi sabitleri
+  const BREAK_SECONDS = 15 * 60; // 15 dakika
+  const FULL_DASH_ARRAY = 283;
+  const WARNING_THRESHOLD = 5 * 60;
+  const ALERT_THRESHOLD = 60;
+
+  const COLOR_CODES = {
+    info: {
+      color: "green"
+    },
+    warning: {
+      color: "orange",
+      threshold: WARNING_THRESHOLD
+    },
+    alert: {
+      color: "red",
+      threshold: ALERT_THRESHOLD
     }
+  };
 
-    function startTimer(timerId) {
-  const timer = timers[timerId];
-  if (!timer || timer.intervalId) return;
+  // Her sekmede çalışan runtime timer map'i
+  let timers = {};
 
-  // Sayaç görünür olsun
-  timer.baseTimerEl.style.display = "inline-flex";
-  // Başlat butonu tamamen kaybolsun
-  if (timer.startButton) {
-    timer.startButton.style.display = "none";
+  // Timerları kalıcı saklamak için localStorage key'i
+  const TIMER_STORAGE_KEY = "molaTimers_v1";
+  let timerStateCache = null;
+
+  function formatTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    if (seconds < 10) seconds = `0${seconds}`;
+    return `${minutes}:${seconds}`;
   }
 
-  timer.timeLeft = timer.timeLimit;
-  updateTimerUi(timer);
+  function calculateTimeFraction(timer) {
+    const rawTimeFraction = timer.timeLeft / timer.timeLimit;
+    return rawTimeFraction - (1 / timer.timeLimit) * (1 - rawTimeFraction);
+  }
 
-  timer.intervalId = setInterval(() => {
-    timer.timeLeft -= 1;
-    if (timer.timeLeft < 0) timer.timeLeft = 0;
+  function setCircleDasharray(timer) {
+    const circleDasharray = `${Math.round(
+      calculateTimeFraction(timer) * FULL_DASH_ARRAY
+    )} ${FULL_DASH_ARRAY}`;
+    if (timer.pathEl) {
+      timer.pathEl.setAttribute("stroke-dasharray", circleDasharray);
+    }
+  }
+
+  function setRemainingPathColor(timer) {
+    const { alert, warning, info } = COLOR_CODES;
+    const path = timer.pathEl;
+    if (!path) return;
+
+    path.classList.remove(info.color, warning.color, alert.color);
+
+    if (timer.timeLeft <= alert.threshold) {
+      path.classList.add(alert.color);
+    } else if (timer.timeLeft <= warning.threshold) {
+      path.classList.add(warning.color);
+    } else {
+      path.classList.add(info.color);
+    }
+  }
+
+  function updateTimerUi(timer) {
+    if (timer.labelEl) {
+      timer.labelEl.textContent = formatTime(Math.max(0, timer.timeLeft));
+    }
+    setRemainingPathColor(timer);
+    setCircleDasharray(timer);
+  }
+
+  // localStorage'dan timer state'ini oku
+  function getTimerStateList() {
+    if (timerStateCache !== null) return timerStateCache;
+    let list = [];
+    try {
+      if (window.localStorage) {
+        const raw = localStorage.getItem(TIMER_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) list = parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("localStorage okunamadı:", e);
+    }
+    timerStateCache = list;
+    return list;
+  }
+
+  // localStorage'a timer state'ini yaz
+  function setTimerStateList(list) {
+    timerStateCache = list;
+    try {
+      if (window.localStorage) {
+        localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(list));
+      }
+    } catch (e) {
+      console.warn("localStorage yazılamadı:", e);
+    }
+  }
+
+  // localStorage değiştiğinde tüm sekmeleri güncel tut
+  window.addEventListener("storage", function (event) {
+    if (event.key === TIMER_STORAGE_KEY) {
+      try {
+        timerStateCache = event.newValue ? JSON.parse(event.newValue) : [];
+      } catch (e) {
+        timerStateCache = [];
+      }
+      syncTimersFromState(timerStateCache);
+    }
+  });
+
+  // State -> tablo & JS timer objelerine senkronizasyon
+  function syncTimersFromState(passedList) {
+    const stateListRaw = passedList || getTimerStateList();
+    const now = Date.now();
+    const activeStates = stateListRaw.filter(s => !s.endAt || s.endAt > now);
+
+    const tbody = document.querySelector("#timerTable tbody");
+    if (!tbody) return;
+
+    // Var olan interval'ları temizle
+    Object.values(timers).forEach(t => {
+      if (t.intervalId) clearInterval(t.intervalId);
+    });
+    timers = {};
+
+    tbody.innerHTML = "";
+
+    if (activeStates.length === 0) {
+      const placeholderRow = document.createElement("tr");
+      placeholderRow.className = "placeholder-row";
+      placeholderRow.innerHTML = `<td colspan="4" class="placeholder">Henüz sayaç başlatılmadı.</td>`;
+      tbody.appendChild(placeholderRow);
+      return;
+    }
+
+    activeStates.forEach((state, idx) => {
+      const { tr, timer } = createTimerRow(state, idx + 1);
+      tbody.appendChild(tr);
+      timers[state.id] = timer;
+
+      // Sayaç daha önce başlatılmışsa, herkeste kaldığı yerden devam
+      if (state.startedAt && state.endAt && state.endAt > now) {
+        runTimerInterval(timer);
+      }
+    });
+  }
+
+  // Tek bir state objesinden tablo satırı ve JS timer nesnesi oluştur
+  function createTimerRow(state, rowIndex) {
+    const timerId = state.id;
+    const pathId = "base-timer-path-" + timerId;
+    const labelId = "base-timer-label-" + timerId;
+    const createdTime = state.createdAt ? new Date(state.createdAt) : new Date();
+    const now = Date.now();
+
+    let timeLeft;
+    if (state.startedAt && state.endAt) {
+      timeLeft = Math.max(0, Math.round((state.endAt - now) / 1000));
+    } else {
+      timeLeft = BREAK_SECONDS;
+    }
+
+    const tr = document.createElement("tr");
+    tr.dataset.timerId = timerId;
+    tr.dataset.name = state.name;
+
+    tr.innerHTML = `
+      <td>${rowIndex}</td>
+      <td>${createdTime.toLocaleString("tr-TR")}</td>
+      <td>${state.name}</td>
+      <td>
+        <div class="timer-cell">
+          <button type="button" class="btn-timer-start">Başlat</button>
+          <div class="base-timer" style="display:none;">
+            <svg class="base-timer__svg" viewBox="0 0 100 100">
+              <g class="base-timer__circle">
+                <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+                <path
+                  id="${pathId}"
+                  stroke-dasharray="${FULL_DASH_ARRAY}"
+                  class="base-timer__path-remaining green"
+                  d="
+                    M 50, 50
+                    m -45, 0
+                    a 45,45 0 1,0 90,0
+                    a 45,45 0 1,0 -90,0
+                  "
+                ></path>
+              </g>
+            </svg>
+            <span id="${labelId}" class="base-timer__label">${formatTime(timeLeft)}</span>
+          </div>
+        </div>
+      </td>
+    `;
+
+    const startButton = tr.querySelector(".btn-timer-start");
+    const baseTimerEl = tr.querySelector(".base-timer");
+    const labelEl = tr.querySelector(`#${labelId}`);
+    const pathEl = tr.querySelector(`#${pathId}`);
+
+
+    const timer = {
+      id: timerId,
+      name: state.name,
+      timeLimit: BREAK_SECONDS,
+      timeLeft: timeLeft,
+      intervalId: null,
+      labelEl,
+      pathEl,
+      baseTimerEl,
+      startButton
+    };
+
+    if (state.startedAt && state.endAt && state.endAt > now && timeLeft > 0) {
+      // Sayaç daha önce başlatılmış, herkes için çalışıyor
+      baseTimerEl.style.display = "inline-flex";
+      if (startButton) startButton.style.display = "none";
+    } else {
+      // Henüz başlatılmamış
+      baseTimerEl.style.display = "none";
+      if (startButton) startButton.style.display = "inline-block";
+    }
 
     updateTimerUi(timer);
 
-    if (timer.timeLeft === 0) {
-      clearInterval(timer.intervalId);
-      timer.intervalId = null;
-      sendNotification(timer.name + " için 15 dakikalık mola süresi doldu.");
-    }
-  }, 1000);
-}
-
-
-    function addTimerEntry(name) {
-      const tbody = document.querySelector("#timerTable tbody");
-      if (!tbody) return;
-
-      const placeholderRow = tbody.querySelector(".placeholder-row");
-      if (placeholderRow) {
-        placeholderRow.remove();
-      }
-
-      const rowIndex = tbody.querySelectorAll("tr").length + 1;
-      const timerId = "t-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-      const pathId = "base-timer-path-" + timerId;
-      const labelId = "base-timer-label-" + timerId;
-
-      const tr = document.createElement("tr");
-      tr.dataset.timerId = timerId;
-      tr.dataset.name = name;
-
-      tr.innerHTML = `
-        <td>${rowIndex}</td>
-        <td>${new Date().toLocaleString("tr-TR")}</td>
-        <td>${name}</td>
-        <td>
-          <div class="timer-cell">
-            <button type="button" class="btn-timer-start">Başlat</button>
-            <div class="base-timer" style="display:none;">
-              <svg class="base-timer__svg" viewBox="0 0 100 100">
-                <g class="base-timer__circle">
-                  <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
-                  <path
-                    id="${pathId}"
-                    stroke-dasharray="${FULL_DASH_ARRAY}"
-                    class="base-timer__path-remaining green"
-                    d="
-                      M 50, 50
-                      m -45, 0
-                      a 45,45 0 1,0 90,0
-                      a 45,45 0 1,0 -90,0
-                    "
-                  ></path>
-                </g>
-              </svg>
-              <span id="${labelId}" class="base-timer__label">${formatTime(
-                BREAK_SECONDS
-              )}</span>
-            </div>
-          </div>
-        </td>
-      `;
-      tbody.appendChild(tr);
-
-      const startButton = tr.querySelector(".btn-timer-start");
-      const baseTimerEl = tr.querySelector(".base-timer");
-      const labelEl = document.getElementById(labelId);
-      const pathEl = document.getElementById(pathId);
-
-      timers[timerId] = {
-        name,
-        timeLimit: BREAK_SECONDS,
-        timeLeft: BREAK_SECONDS,
-        intervalId: null,
-        labelEl,
-        pathEl,
-        baseTimerEl,
-        startButton
-      };
-
+    if (startButton) {
       startButton.addEventListener("click", () => {
         startTimer(timerId);
       });
     }
 
-    // Console’dan test için:
-    window.addTimerEntry = addTimerEntry;
-    window.startTimer = startTimer;
+    return { tr, timer };
+  }
 
-    // Mola sırası listesini yenileyen fonksiyon
-    async function refreshQueue() {
-      const loader = document.getElementById("loaderQueue");
-      const tbody = document.querySelector("#molaTableQueue tbody");
+  // Başlat butonuna tıklandığında çalışır (veya konsoldan startTimer('id') çağrıldığında)
+  function startTimer(timerId) {
+    const timer = timers[timerId];
+    if (!timer || timer.intervalId) return;
 
-      if (loader) loader.style.display = "block";
+    const list = getTimerStateList();
+    const idx = list.findIndex(s => s.id === timerId);
+    if (idx === -1) return;
 
-      try {
-        const res = await fetch(`${BASE_URL_QUEUE}&cacheBuster=${Date.now()}`, {
-          cache: "no-store",
-        });
-        const txt = await res.text();
-        const json = JSON.parse(
-          txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
-        );
-        const rows = json.table.rows || [];
+    const now = Date.now();
+    list[idx].startedAt = now;
+    list[idx].endAt = now + timer.timeLimit * 1000;
+    setTimerStateList(list); // 👉 Diğer sekmelere de bu bilgi gider
 
-        const dataRows = rows.filter((r) => {
-          const t = r.c?.[0]?.v;
-          const n = r.c?.[1]?.v;
-          return (
-            t &&
-            n &&
-            n.toString().toLowerCase() !== "ad soyad" &&
-            t.toString().toLowerCase() !== "zaman damgası"
-          );
-        });
+    timer.timeLeft = timer.timeLimit;
+    if (timer.baseTimerEl) timer.baseTimerEl.style.display = "inline-flex";
+    if (timer.startButton) timer.startButton.style.display = "none";
 
-        const currentNames = dataRows.map((r) => r.c[1].v);
+    updateTimerUi(timer);
+    runTimerInterval(timer);
+  }
 
-        // Sıradan çıkan isimler
-        const leavingNames = previousNames.filter(
-          (name) => !currentNames.includes(name)
-        );
+  // Her 1 saniyede bir kalan süreyi state'e göre günceller
+  function runTimerInterval(timer) {
+    if (timer.intervalId) clearInterval(timer.intervalId);
 
-        leavingNames.forEach((isim) => {
-          sendNotification(isim + ", mola sırası sende!");
-          addTimerEntry(isim);
-        });
-
-        tbody.innerHTML = "";
-        if (dataRows.length > 0) {
-          dataRows.forEach((r, i) => {
-            const ts = r.c[0].f || r.c[0].v || "-";
-            const name = r.c[1].v || "-";
-            const tr = document.createElement("tr");
-            tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
-            tbody.appendChild(tr);
-          });
-        } else {
-          tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
-        }
-
-        previousNames = currentNames.slice();
-      } catch (e) {
-        console.error("Veri yüklenirken hata (Queue):", e);
-        if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
-        }
-      } finally {
-        if (loader) loader.style.display = "none";
-      }
-    }
-
-    // Uyarı metnini çeken fonksiyon
-    async function refreshWarning() {
-      try {
-        const res = await fetch(`${BASE_URL_WARNING}&cacheBuster=${Date.now()}`, {
-          cache: "no-store",
-        });
-        const txt = await res.text();
-        const json = JSON.parse(
-          txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
-        );
-        const rows = json.table.rows || [];
-
-        if (rows.length > 0 && rows[0].c?.[1]?.v) {
-          const warningText = rows[0].c[1].v;
-          document.querySelector(".degisken").innerText = warningText;
-        } else {
-          document.querySelector(".degisken").innerText = "";
-        }
-      } catch (e) {
-        console.error("Uyarı metni alınırken hata:", e);
-        document.querySelector(".degisken").innerText = "";
-      }
-    }
-
-    // Bildirim izni
-    function requestNotificationPermission() {
-      if (!("Notification" in window)) {
-        console.log("Notification API desteklenmiyor.");
+    timer.intervalId = setInterval(() => {
+      const list = getTimerStateList();
+      const state = list.find(s => s.id === timer.id);
+      if (!state || !state.endAt) {
+        clearInterval(timer.intervalId);
+        timer.intervalId = null;
         return;
       }
-      if (Notification.permission !== "granted") {
-        Notification.requestPermission()
-          .then(permission => {
-            console.log("Bildirim izni durumu:", permission);
-          })
-          .catch(err => {
-            console.error("Bildirim izni alınamadı:", err);
-          });
-      } else {
-        console.log("Bildirim izni zaten verilmiş:", Notification.permission);
-      }
-    }
 
-    // Tarayıcı bildirimi + ses
-    function sendNotification(message) {
-      if (Notification.permission === "granted") {
-        const notificationSound = new Audio(
-          "https://www.soundjay.com/button/beep-07.wav"
+      const now = Date.now();
+      const timeLeft = Math.max(0, Math.round((state.endAt - now) / 1000));
+      timer.timeLeft = timeLeft;
+      updateTimerUi(timer);
+
+      if (timeLeft <= 0) {
+        clearInterval(timer.intervalId);
+        timer.intervalId = null;
+        handleTimerFinished(timer);
+      }
+    }, 1000);
+  }
+
+  // Sayaç bittiğinde: bildirim gönder, state'ten sil, tabloyu yenile
+  function handleTimerFinished(timer) {
+    const list = getTimerStateList();
+    const idx = list.findIndex(s => s.id === timer.id);
+    if (idx === -1) {
+      return; // başka sekme zaten silmiş olabilir
+    }
+    list.splice(idx, 1);
+    setTimerStateList(list);
+
+    // 15 dakika bitti bildirimi
+    sendNotification(timer.name + " için 15 dakikalık mola süresi doldu.");
+
+    // Tüm sekmelerde tabloyu güncelle
+    syncTimersFromState(list);
+  }
+
+  // Yeni bir isim sayaç listesine eklendiğinde (queue'dan düşerken) çağrılır
+  function addTimerEntry(name) {
+    const trimmedName = (name || "").toString().trim();
+    if (!trimmedName) return;
+
+    const list = getTimerStateList();
+    const now = Date.now();
+
+    // Aynı isim için zaten aktif sayaç varsa bir daha ekleme
+    const already = list.some(
+      s =>
+        s.name === trimmedName &&
+        (!s.endAt || s.endAt > now)
+    );
+    if (already) return;
+
+    const timerId = "t-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+    const newState = {
+      id: timerId,
+      name: trimmedName,
+      createdAt: now,
+      startedAt: null, // Başlat'a basılana kadar null
+      endAt: null
+    };
+    list.push(newState);
+    setTimerStateList(list);
+    syncTimersFromState(list);
+  }
+
+  // Console’dan test için:
+  window.addTimerEntry = addTimerEntry;
+  window.startTimer = startTimer;
+
+  // Mola sırası listesini yenileyen fonksiyon
+  async function refreshQueue() {
+    const loader = document.getElementById("loaderQueue");
+    const tbody = document.querySelector("#molaTableQueue tbody");
+
+    if (loader) loader.style.display = "block";
+
+    try {
+      const res = await fetch(`${BASE_URL_QUEUE}&cacheBuster=${Date.now()}`, {
+        cache: "no-store",
+      });
+      const txt = await res.text();
+      const json = JSON.parse(
+        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+      );
+      const rows = json.table.rows || [];
+
+      const dataRows = rows.filter((r) => {
+        const t = r.c?.[0]?.v;
+        const n = r.c?.[1]?.v;
+        return (
+          t &&
+          n &&
+          n.toString().toLowerCase() !== "ad soyad" &&
+          t.toString().toLowerCase() !== "zaman damgası"
         );
-        notificationSound.play().catch(() => {});
-        new Notification(message);
-        console.log("Bildirim gönderildi:", message);
+      });
+
+      const currentNames = dataRows.map((r) => r.c[1].v);
+
+      // Sıradan çıkan isimler → yeni sayaç entry
+      const leavingNames = previousNames.filter(
+        (name) => !currentNames.includes(name)
+      );
+
+      leavingNames.forEach((isim) => {
+        sendNotification(isim + ", mola sırası sende!");
+        addTimerEntry(isim); // 👉 Artık localStorage'a yazılıyor, F5 ile kaybolmuyor
+      });
+
+      tbody.innerHTML = "";
+      if (dataRows.length > 0) {
+        dataRows.forEach((r, i) => {
+          const ts = r.c[0].f || r.c[0].v || "-";
+          const name = r.c[1].v || "-";
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
+          tbody.appendChild(tr);
+        });
       } else {
-        console.log("Bildirim izni verilmedi. Mesaj:", message);
+        tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
       }
+
+      previousNames = currentNames.slice();
+    } catch (e) {
+      console.error("Veri yüklenirken hata (Queue):", e);
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
+      }
+    } finally {
+      if (loader) loader.style.display = "none";
+    }
+  }
+
+  // Uyarı metnini çeken fonksiyon
+  async function refreshWarning() {
+    try {
+      const res = await fetch(`${BASE_URL_WARNING}&cacheBuster=${Date.now()}`, {
+        cache: "no-store",
+      });
+      const txt = await res.text();
+      const json = JSON.parse(
+        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+      );
+      const rows = json.table.rows || [];
+
+      if (rows.length > 0 && rows[0].c?.[1]?.v) {
+        const warningText = rows[0].c[1].v;
+        document.querySelector(".degisken").innerText = warningText;
+      } else {
+        document.querySelector(".degisken").innerText = "";
+      }
+    } catch (e) {
+      console.error("Uyarı metni alınırken hata:", e);
+      document.querySelector(".degisken").innerText = "";
+    }
+  }
+
+  // Bildirim izni
+  function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+      console.log("Notification API desteklenmiyor.");
+      return;
+    }
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission()
+        .then(permission => {
+          console.log("Bildirim izni durumu:", permission);
+        })
+        .catch(err => {
+          console.error("Bildirim izni alınamadı:", err);
+        });
+    } else {
+      console.log("Bildirim izni zaten verilmiş:", Notification.permission);
+    }
+  }
+
+  // Tarayıcı bildirimi + ses
+  function sendNotification(message) {
+    if (Notification.permission === "granted") {
+      const notificationSound = new Audio(
+        "https://www.soundjay.com/button/beep-07.wav"
+      );
+      notificationSound.play().catch(() => {});
+      new Notification(message);
+      console.log("Bildirim gönderildi:", message);
+    } else {
+      console.log("Bildirim izni verilmedi. Mesaj:", message);
+    }
+  }
+
+  // Sayfa yüklendiğinde
+  window.addEventListener("load", () => {
+    requestNotificationPermission();
+
+    // Google Form modal kontrolü
+    const openFormBtn = document.getElementById("openFormBtn");
+    const formModal   = document.getElementById("formModal");
+    const closeFormBtn = document.getElementById("closeFormBtn");
+
+    if (openFormBtn && formModal) {
+      openFormBtn.addEventListener("click", () => {
+        formModal.classList.remove("form-modal--hidden");
+      });
     }
 
-    // Sayfa yüklendiğinde
-    window.addEventListener("load", () => {
-      requestNotificationPermission();
+    if (closeFormBtn && formModal) {
+      closeFormBtn.addEventListener("click", () => {
+        formModal.classList.add("form-modal--hidden");
+      });
+    }
 
-      // Google Form modal kontrolü
-      const openFormBtn = document.getElementById("openFormBtn");
-      const formModal   = document.getElementById("formModal");
-      const closeFormBtn = document.getElementById("closeFormBtn");
-
-      if (openFormBtn && formModal) {
-        openFormBtn.addEventListener("click", () => {
-          formModal.classList.remove("form-modal--hidden");
-        });
-      }
-
-      if (closeFormBtn && formModal) {
-        closeFormBtn.addEventListener("click", () => {
+    if (formModal) {
+      const backdrop = formModal.querySelector(".form-modal__backdrop");
+      if (backdrop) {
+        backdrop.addEventListener("click", () => {
           formModal.classList.add("form-modal--hidden");
         });
       }
+    }
 
-      if (formModal) {
-        const backdrop = formModal.querySelector(".form-modal__backdrop");
-        if (backdrop) {
-          backdrop.addEventListener("click", () => {
-            formModal.classList.add("form-modal--hidden");
-          });
-        }
-      }
+    // İlk yükleme
+    refreshQueue();
+    refreshWarning();
+    syncTimersFromState(); // 👉 localStorage'daki sayaçları tabloya yansıt
 
+    // Her 5 saniyede bir sıra + uyarı metni güncelle
+    setInterval(() => {
       refreshQueue();
       refreshWarning();
+    }, 5000);
 
-      setInterval(() => {
-        refreshQueue();
-        refreshWarning();
-      }, 5000);
+    // 3.8 saniye sonra canvas'ları fade-out ile kaldır
+    setTimeout(() => {
+      document
+        .querySelectorAll('#canvas-shapes, #canvas-stars')
+        .forEach(canvas => {
+          canvas.classList.add('fade-out');
+          setTimeout(() => canvas.remove(), 1000);
+        });
+    }, 3800);
+  });
+</script>
 
-      setTimeout(() => {
-        document
-          .querySelectorAll('#canvas-shapes, #canvas-stars')
-          .forEach(canvas => {
-            canvas.classList.add('fade-out');
-            setTimeout(() => canvas.remove(), 1000);
-          });
-      }, 3800);
-    });
-  </script>
 </body>
 </html>
