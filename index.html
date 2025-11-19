@@ -1043,6 +1043,30 @@ function runTimerInterval(timer) {
 }
 
 // Sunucudan tüm aktif sayaçları çekip tabloyu yeniler
+// İSİM BAZLI TEKRARLARI TEMİZLE
+function dedupeTimersByName(stateList) {
+  const seen = new Set();
+  const result = [];
+
+  // sheet’teki sırayı korumak için gelen sıralamayla geziyoruz
+  for (const st of stateList) {
+    const key = (st.name || "").toString().trim().toLowerCase();
+    if (!key) {
+      // isimsiz bir satır varsa dokunma
+      result.push(st);
+      continue;
+    }
+    if (seen.has(key)) {
+      // aynı isim daha önce eklendiyse bunu atlıyoruz
+      continue;
+    }
+    seen.add(key);
+    result.push(st);
+  }
+
+  return result;
+}
+
 async function refreshTimersFromServer() {
   const loader = document.getElementById("loaderTimer");
   const tbody = document.querySelector("#timerTable tbody");
@@ -1057,10 +1081,14 @@ async function refreshTimersFromServer() {
     const data = await res.json();
     if (!data.success) throw new Error(data.message || "Sayaç listesi alınamadı");
 
-    const stateList = Array.isArray(data.timers) ? data.timers : [];
+    // 🔹 Önce orijinal liste
+    const rawList = Array.isArray(data.timers) ? data.timers : [];
+    // 🔹 Sonra JS tarafında tekrarlayan isimleri temizliyoruz
+    const stateList = dedupeTimersByName(rawList);
+
     const now = Date.now();
 
-    // Eski interval'ları temizle
+    // Eski interval’ları temizle
     Object.values(timers).forEach(t => {
       if (t.intervalId) clearInterval(t.intervalId);
     });
@@ -1101,6 +1129,7 @@ async function refreshTimersFromServer() {
     if (loader) loader.style.display = "none";
   }
 }
+
 
 // Yeni timer kaydı ekle (sıradan çıkınca)
 async function addTimerEntry(name) {
