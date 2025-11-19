@@ -873,7 +873,7 @@ const BASE_URL_WARNING =
 // === YENİ: Sayaçlar için Apps Script API ===
 const SHEET_NAME_TIMERS = "Sayaçlar";
 // 👉 BURAYA Apps Script Web App URL'ini yapıştır:
-const TIMERS_API_URL = "https://script.google.com/macros/s/AKfycbym6SIQkSnEqSijKeeqAzLcG5GOrHbVqtJ_AhRjAbegGGEzxUhZL5O7WKgCEjY9Z868/exec";
+const TIMERS_API_URL = "https://script.google.com/macros/s/AKfycbxrSNfStcshzAZxTeXuAZMzc6esDcEfOWO0KLWfg5X-KeXULopPAtCP_W6qmWISEIW7/exec";
 
 // Önceki isim listesi (mola sırası sheet'i için)
 let previousNames = [];
@@ -1070,7 +1070,7 @@ function dedupeTimersByName(stateList) {
 async function refreshTimersFromServer() {
   const loader = document.getElementById("loaderTimer");
   const tbody = document.querySelector("#timerTable tbody");
-  if (!tbody || !TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbym6SIQkSnEqSijKeeqAzLcG5GOrHbVqtJ_AhRjAbegGGEzxUhZL5O7WKgCEjY9Z868/exec") {
+  if (!tbody || !TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbxrSNfStcshzAZxTeXuAZMzc6esDcEfOWO0KLWfg5X-KeXULopPAtCP_W6qmWISEIW7/exec") {
     return;
   }
 
@@ -1136,7 +1136,7 @@ async function refreshTimersFromServer() {
 // Başlat butonuna basıldığında
 async function startTimer(timerId) {
   const timer = timers[timerId];
-  if (!timer || timer.intervalId || timer.endAt || !TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbym6SIQkSnEqSijKeeqAzLcG5GOrHbVqtJ_AhRjAbegGGEzxUhZL5O7WKgCEjY9Z868/exec") return;
+  if (!timer || timer.intervalId || timer.endAt || !TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbxrSNfStcshzAZxTeXuAZMzc6esDcEfOWO0KLWfg5X-KeXULopPAtCP_W6qmWISEIW7/exec") return;
 
   try {
     const res = await fetch(`${TIMERS_API_URL}?action=start&id=${encodeURIComponent(timerId)}&ts=${Date.now()}`);
@@ -1165,7 +1165,7 @@ async function startTimer(timerId) {
 async function handleTimerFinished(timer) {
   sendNotification(timer.name + " için 15 dakikalık mola süresi doldu.");
 
-  if (!TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbym6SIQkSnEqSijKeeqAzLcG5GOrHbVqtJ_AhRjAbegGGEzxUhZL5O7WKgCEjY9Z868/exec") return;
+  if (!TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbxrSNfStcshzAZxTeXuAZMzc6esDcEfOWO0KLWfg5X-KeXULopPAtCP_W6qmWISEIW7/exec") return;
 
   try {
     await fetch(`${TIMERS_API_URL}?action=finish&id=${encodeURIComponent(timer.id)}&ts=${Date.now()}`);
