@@ -1070,7 +1070,7 @@ function dedupeTimersByName(stateList) {
 async function refreshTimersFromServer() {
   const loader = document.getElementById("loaderTimer");
   const tbody = document.querySelector("#timerTable tbody");
-  if (!tbody || !TIMERS_API_URL || TIMERS_API_URL === "BURAYA_WEB_APP_URL") {
+  if (!tbody || !TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbzN7303uTNHau763di6uZ-fMuKMS8BdV_zJdqjD7AYnHRQpw4aVVSYV8GCD81BXPYZu/exec") {
     return;
   }
 
@@ -1136,7 +1136,7 @@ async function refreshTimersFromServer() {
 // Başlat butonuna basıldığında
 async function startTimer(timerId) {
   const timer = timers[timerId];
-  if (!timer || timer.intervalId || timer.endAt || !TIMERS_API_URL || TIMERS_API_URL === "BURAYA_WEB_APP_URL") return;
+  if (!timer || timer.intervalId || timer.endAt || !TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbzN7303uTNHau763di6uZ-fMuKMS8BdV_zJdqjD7AYnHRQpw4aVVSYV8GCD81BXPYZu/exec") return;
 
   try {
     const res = await fetch(`${TIMERS_API_URL}?action=start&id=${encodeURIComponent(timerId)}&ts=${Date.now()}`);
@@ -1165,7 +1165,7 @@ async function startTimer(timerId) {
 async function handleTimerFinished(timer) {
   sendNotification(timer.name + " için 15 dakikalık mola süresi doldu.");
 
-  if (!TIMERS_API_URL || TIMERS_API_URL === "BURAYA_WEB_APP_URL") return;
+  if (!TIMERS_API_URL || TIMERS_API_URL === "https://script.google.com/macros/s/AKfycbzN7303uTNHau763di6uZ-fMuKMS8BdV_zJdqjD7AYnHRQpw4aVVSYV8GCD81BXPYZu/exec") return;
 
   try {
     await fetch(`${TIMERS_API_URL}?action=finish&id=${encodeURIComponent(timer.id)}&ts=${Date.now()}`);
