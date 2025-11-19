@@ -1081,11 +1081,7 @@ async function refreshTimersFromServer() {
     const data = await res.json();
     if (!data.success) throw new Error(data.message || "Sayaç listesi alınamadı");
 
-    // 🔹 Önce orijinal liste
-    const rawList = Array.isArray(data.timers) ? data.timers : [];
-    // 🔹 Sonra JS tarafında tekrarlayan isimleri temizliyoruz
-    const stateList = dedupeTimersByName(rawList);
-
+    const stateList = Array.isArray(data.timers) ? data.timers : [];
     const now = Date.now();
 
     // Eski interval’ları temizle
@@ -1098,7 +1094,8 @@ async function refreshTimersFromServer() {
     if (stateList.length === 0) {
       const placeholderRow = document.createElement("tr");
       placeholderRow.className = "placeholder-row";
-      placeholderRow.innerHTML = `<td colspan="4" class="placeholder">Henüz sayaç başlatılmadı.</td>`;
+      placeholderRow.innerHTML =
+        `<td colspan="4" class="placeholder">Henüz sayaç başlatılmadı.</td>`;
       tbody.appendChild(placeholderRow);
       return;
     }
@@ -1106,7 +1103,7 @@ async function refreshTimersFromServer() {
     stateList.forEach((state, idx) => {
       state.createdAt = state.createdAt ? Number(state.createdAt) : null;
       state.startedAt = state.startedAt ? Number(state.startedAt) : null;
-      state.endAt = state.endAt ? Number(state.endAt) : null;
+      state.endAt     = state.endAt     ? Number(state.endAt)     : null;
 
       if (state.endAt && state.endAt <= now) return;
 
@@ -1122,7 +1119,8 @@ async function refreshTimersFromServer() {
     console.error("Sayaçlar yüklenirken hata:", err);
     if (!tbody.querySelector(".placeholder-row")) {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="4" class="placeholder">Sayaç verisi yüklenemedi.</td>`;
+      tr.innerHTML =
+        `<td colspan="4" class="placeholder">Sayaç verisi yüklenemedi.</td>`;
       tbody.appendChild(tr);
     }
   } finally {
@@ -1131,23 +1129,9 @@ async function refreshTimersFromServer() {
 }
 
 
-// Yeni timer kaydı ekle (sıradan çıkınca)
-async function addTimerEntry(name) {
-  const trimmedName = (name || "").toString().trim();
-  if (!trimmedName || !TIMERS_API_URL || TIMERS_API_URL === "BURAYA_WEB_APP_URL") return;
 
-  try {
-    const res = await fetch(`${TIMERS_API_URL}?action=add&name=${encodeURIComponent(trimmedName)}&ts=${Date.now()}`);
-    const data = await res.json();
-    if (!data.success) {
-      console.error("Sayaç eklenemedi:", data.message);
-      return;
-    }
-    await refreshTimersFromServer();
-  } catch (err) {
-    console.error("Sayaç eklenemedi:", err);
-  }
-}
+// Yeni timer kaydı ekle (sıradan çıkınca)
+
 
 // Başlat butonuna basıldığında
 async function startTimer(timerId) {
@@ -1197,6 +1181,7 @@ window.addTimerEntry = addTimerEntry;
 window.startTimer = startTimer;
 
 // Mola sırası listesini yenileyen fonksiyon
+// Mola sırası listesini yenileyen fonksiyon
 async function refreshQueue() {
   const loader = document.getElementById("loaderQueue");
   const tbody = document.querySelector("#molaTableQueue tbody");
@@ -1224,41 +1209,30 @@ async function refreshQueue() {
       );
     });
 
-    const currentNames = dataRows.map((r) => r.c[1].v);
-
-    // Sıradan çıkan isimler → yeni sayaç entry
-    const leavingNames = previousNames.filter(
-      (name) => !currentNames.includes(name)
-    );
-
-    leavingNames.forEach((isim) => {
-      sendNotification(isim + ", mola sırası sende!");
-      addTimerEntry(isim);
-    });
-
     tbody.innerHTML = "";
     if (dataRows.length > 0) {
       dataRows.forEach((r, i) => {
-        const ts = r.c[0].f || r.c[0].v || "-";
+        const ts   = r.c[0].f || r.c[0].v || "-";
         const name = r.c[1].v || "-";
         const tr = document.createElement("tr");
         tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
         tbody.appendChild(tr);
       });
     } else {
-      tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
+      tbody.innerHTML =
+        `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
     }
-
-    previousNames = currentNames.slice();
   } catch (e) {
     console.error("Veri yüklenirken hata (Queue):", e);
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
+      tbody.innerHTML =
+        `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
     }
   } finally {
     if (loader) loader.style.display = "none";
   }
 }
+
 
 // Uyarı metnini çeken fonksiyon
 async function refreshWarning() {
