@@ -1351,6 +1351,39 @@ window.addEventListener("load", () => {
       });
   }, 3800);
 });
+
+  // ---- Test fonksiyonları (debug için) ----
+window.testTimersApiList = async function () {
+  const url = `${TIMERS_API_URL}?action=list&ts=${Date.now()}`;
+  console.log("[testTimersApiList] url =", url);
+
+  try {
+    const res = await fetch(url);
+    console.log("[testTimersApiList] status:", res.status);
+    const data = await res.json();
+    console.log("[testTimersApiList] body:", data);
+  } catch (e) {
+    console.error("[testTimersApiList] hata:", e);
+  }
+};
+
+window.testTimersApiFinish = async function (id) {
+  const url = `${TIMERS_API_URL}?action=finish&id=${encodeURIComponent(
+    id
+  )}&ts=${Date.now()}`;
+
+  console.log("[testTimersApiFinish] url =", url);
+
+  try {
+    const res = await fetch(url);
+    console.log("[testTimersApiFinish] status:", res.status);
+    const data = await res.json();
+    console.log("[testTimersApiFinish] body:", data);
+  } catch (e) {
+    console.error("[testTimersApiFinish] hata:", e);
+  }
+};
+
 </script>
 </body>
 </html>
