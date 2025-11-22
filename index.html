@@ -10,30 +10,6 @@
     rel="stylesheet"
   />
   <style>
-#canvas-stars {
-      background: black;
-      z-index: 2;
-    }
-#canvas-stars, #canvas-shapes {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    #canvas-shapes { z-index: 2; }
-    #toggleHint {
-      color: #8f9ebb;
-      font-size: 16px;
-      position: absolute;
-      top: 30px;
-      left: 30px;
-      z-index: 3;
-      user-select: none;
-      margin: 0;
-    }
-    #logoImg { display: none; }
-
     /* ---------- DEĞİŞKENLER (Light Mode) ---------- */
     :root {
       --primary-color: #002f6c;
@@ -84,11 +60,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative; /* gradient-bg’i kapsayacak şekilde */
+      position: relative;
       color: var(--primary-color);
     }
 
-    /* ---------- GRADIENT BLOBS ARKA PLAN ---------- */
+    /* ---------- GRADIENT BLOBS ARKA PLAN (STATİK) ---------- */
     .gradient-bg {
       position: fixed;
       top: 0;
@@ -111,6 +87,8 @@
       width: 100%;
       height: 100%;
     }
+
+    /* Animasyon keyframe'leri artık kullanılmıyor ama kalsın; hiçbir yerde çağrılmıyor. */
     @keyframes moveInCircle {
       0%   { transform: rotate(0deg); }
       50%  { transform: rotate(180deg); }
@@ -126,6 +104,7 @@
       50%  { transform: translateX(50%) translateY(10%); }
       100% { transform: translateX(-50%) translateY(-10%); }
     }
+
     .gradient-bg .g1,
     .gradient-bg .g2,
     .gradient-bg .g3,
@@ -148,24 +127,24 @@
     .gradient-bg .g1 {
       background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%) no-repeat;
       transform-origin: center center;
-      animation: moveVertical 30s ease infinite;
+      /* animasyon kaldırıldı */
     }
     .gradient-bg .g2 {
       background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 50%) no-repeat;
       transform-origin: calc(50% - 400px);
-      animation: moveInCircle 20s reverse infinite;
+      /* animasyon kaldırıldı */
     }
     .gradient-bg .g3 {
       background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%) no-repeat;
       top: calc(50% - var(--circle-size) / 2 + 200px);
       left: calc(50% - var(--circle-size) / 2 - 500px);
       transform-origin: calc(50% + 400px);
-      animation: moveInCircle 40s linear infinite;
+      /* animasyon kaldırıldı */
     }
     .gradient-bg .g4 {
       background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%) no-repeat;
       transform-origin: calc(50% - 200px);
-      animation: moveHorizontal 40s ease infinite;
+      /* animasyon kaldırıldı */
       opacity: 0.7;
     }
     .gradient-bg .g5 {
@@ -175,7 +154,7 @@
       top: calc(50% - var(--circle-size));
       left: calc(50% - var(--circle-size));
       transform-origin: calc(50% - 800px) calc(50% + 200px);
-      animation: moveInCircle 20s ease infinite;
+      /* animasyon kaldırıldı */
     }
     .gradient-bg .interactive {
       background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.8) 0, rgba(var(--color-interactive), 0) 50%) no-repeat;
@@ -184,9 +163,10 @@
       top: -50%;
       left: -50%;
       opacity: 0.7;
+      /* animasyon kaldırıldı */
     }
 
-    /* ---------- ORİJİNAL CARD STİLLERİ (BİRKAÇ KÜÇÜK EKLEMEYLE) ---------- */
+    /* ---------- CARD ---------- */
     .card {
       background-color: var(--light-bg);
       border-radius: var(--border-radius);
@@ -195,8 +175,8 @@
       max-width: 90%;
       padding: 24px;
       box-sizing: border-box;
-      position: relative; /* z-index tanımlamak için */
-      z-index: 1;        /* Gradient’in üstünde */
+      position: relative;
+      z-index: 1;
       margin: 2rem auto;
       color: var(--primary-color);
     }
@@ -216,7 +196,7 @@
       font-size: 1.6rem;
       font-weight: 600;
       color: var(--primary-color);
-      line-height: 1.6rem; /* Logo ile hizayı korumak için */
+      line-height: 1.6rem;
     }
     .title {
       font-size: 2.4rem;
@@ -258,11 +238,26 @@
       color: rgb(78, 0, 82);
       border: 1px solid rgb(153, 108, 156);
     }
+
+    /* FORM iframe (başta gizli) */
+    #formFrame {
+      display: none;
+      width: 100%;
+      height: 600px;
+      border: 0;
+      margin-top: 16px;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
     .table-wrapper {
       position: relative;
       overflow-x: auto;
+      margin-top: 24px;
       margin-bottom: 24px;
     }
+
+    /* Loader - animasyonlar kaldırıldı, sadece statik görünüm */
     .loader {
       position: absolute;
       top: -32px;
@@ -285,32 +280,21 @@
       left: 0;
       top: 0;
       border-bottom: 3px solid var(--turknet-yellow);
-      animation: rotate-one 1s linear infinite;
+      /* animation kaldırıldı */
     }
     .inner.two {
       right: 0;
       top: 0;
       border-right: 3px solid var(--turknet-yellow);
-      animation: rotate-two 1s linear infinite;
+      /* animation kaldırıldı */
     }
     .inner.three {
       right: 0;
       bottom: 0;
       border-top: 3px solid var(--turknet-yellow);
-      animation: rotate-three 1s linear infinite;
+      /* animation kaldırıldı */
     }
-    @keyframes rotate-one {
-      from { transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg); }
-      to   { transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg); }
-    }
-    @keyframes rotate-two {
-      from { transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg); }
-      to   { transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg); }
-    }
-    @keyframes rotate-three {
-      from { transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg); }
-      to   { transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg); }
-    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -347,16 +331,16 @@
       color: rgb(78, 0, 82);
     }
     .card-footer .version {
-      opacity: 0.6;      /* “v.2” kısmı biraz silik */
+      opacity: 0.6;
       font-size: 0.85rem;
       margin-bottom: 4px;
     }
     .card-footer .copyright {
       font-size: 0.67rem;
-      opacity: 0.9;      /* Telif hakkı biraz daha net */
+      opacity: 0.9;
     }
 
-    /* ---------- TEMA DEĞİŞTİRME BUTONU (DAHA DİKKAT ÇEKİCİ) ---------- */
+    /* ---------- TEMA DEĞİŞTİRME BUTONU (Şimdilik kullanılmıyor) ---------- */
     .theme-toggle {
       position: absolute;
       top: 16px;
@@ -387,14 +371,7 @@
   </style>
 </head>
 <body>
-<!-- ⭐ Yıldız Arka Planı -->
-  <canvas id="canvas-stars"></canvas>
-  <!-- 🔄 Animasyon İpucu -->
-    <!-- ⚪ Nokta Partikülleri -->
-  <canvas id="canvas-shapes"></canvas>
-  <!-- Gizli Logo Görseli -->
-  <img id="logoImg" src="https://ik.imagekit.io/labi7oyze/logo_image.png?updatedAt=1762089509729" crossOrigin="anonymous" alt="Logo" />
-  <!-- ---------- GRADIENT BLOBS ARKA PLAN ---------- -->
+  <!-- ---------- STATİK GRADIENT BLOBS ARKA PLAN ---------- -->
   <div class="gradient-bg">
     <svg xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -420,37 +397,42 @@
     </div>
   </div>
 
-  <!-- ---------- MEVCUT CARD BÖLÜMÜ ---------- -->
+  <!-- ---------- CARD BÖLÜMÜ ---------- -->
   <div class="card">
-    <!-- Tema Değiştirme Butonu (Daha belirgin ikon + metin) -->
-
-
-    <!-- Logo ve “TurkNet” Metni (Logotype olarak resim) -->
+    <!-- Logo ve “TurkNet” Metni (Logotype olarak SVG) -->
     <div class="logo">
-     <svg width="112" height="32" viewBox="0 0 112 32" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M26.8819 23.7083C24.6963 23.7083 23.3762 22.1348 23.3762 19.5121V10.1929H19.4073V19.7394C19.4073 24.5476 22.1873 27.3713 26.8819 27.3713C31.5765 27.3713 34.3304 24.5214 34.3304 19.7394V10.1929H30.3613V19.5121C30.3613 22.1348 29.0413 23.7083 26.8732 23.7083H26.8819ZM62.6642 10.1929H58.4679C58.1707 13.1565 55.5304 15.4382 51.8849 16.3911V4.63281H47.916V27.0129H51.8849V22.1348C51.8849 21.2955 52.4357 20.4912 53.205 20.1503L58.739 27.0129H63.3898L56.5534 18.4892C59.5607 16.6446 62.0261 13.751 62.6642 10.1929ZM36.0264 27.0129H39.9954V19.2848C39.9954 14.8874 42.3908 13.2876 46.3511 14.022V9.87815C44.2354 9.7645 42.452 9.90437 40.6074 10.7873C36.551 12.7019 36.0264 16.3736 36.0264 20.3338V27.0129ZM80.1664 18.7603C80.1664 23.7958 83.8119 27.3713 88.9174 27.3713C92.3619 27.3713 95.1856 25.754 96.6892 22.8778L93.2273 21.3042C92.1083 23.0789 90.8144 23.8832 89.0572 23.8832C86.5744 23.8832 84.6162 22.3358 84.3889 20.1678C85.7527 20.4825 87.2564 20.666 88.7863 20.666C91.3128 20.666 94.0753 20.1677 97.1264 19.1624C97.1701 18.6816 97.1701 18.498 97.1701 18.227C97.1701 13.375 93.6382 9.81695 88.8562 9.81695C84.0741 9.81695 80.1751 13.6198 80.1751 18.7515H80.1664V18.7603ZM84.3539 16.8894C84.6948 14.8612 86.6968 13.2439 88.8649 13.2439C91.033 13.2439 92.7203 14.7738 93.0088 16.8894C91.6887 17.2566 90.2987 17.4402 88.7688 17.4402C87.2389 17.4402 85.7876 17.2566 84.3451 16.8894H84.3539ZM71.3716 13.4974C73.5396 13.4974 74.8597 15.071 74.8597 17.6937V27.0129H78.8288V17.4664C78.8288 12.6844 76.0487 9.83443 71.3803 9.83443C66.7119 9.83443 63.9056 12.6582 63.9056 17.4664V27.0129H67.8746V17.6937C67.8746 15.071 69.1947 13.4974 71.3803 13.4974H71.3716ZM14.599 20.0366C14.599 21.8812 14.1444 23.7083 12.0025 23.7083C8.85526 23.7083 8.96894 19.853 8.96894 17.6238V13.8821H5V17.6238C5 22.4058 5.93535 27.3801 11.8102 27.3801C16.3474 27.3801 18.4194 24.4165 18.4194 20.0453H14.5903H14.599V20.0366ZM5.00864 4.63281V10.1929C5.00864 12.2211 6.53858 13.8821 8.42692 13.8821H14.9924V10.1929H8.97769V4.63281H5.00864ZM108.011 20.0366C108.011 21.8812 107.556 23.7083 105.414 23.7083C102.267 23.7083 102.38 19.853 102.38 17.6238V13.8821H98.4116V17.6238C98.4116 22.4058 99.3469 27.3801 105.222 27.3801C109.759 27.3801 111.831 24.4165 111.831 20.0453H108.002L108.011 20.0366ZM98.4203 4.63281V10.1929C98.4203 12.2211 99.9501 13.8821 101.838 13.8821H108.404V10.1929H102.389V4.63281H98.4203Z" fill="#471E50"></path> </svg>
-    
+      <svg width="112" height="32" viewBox="0 0 112 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M26.8819 23.7083C24.6963 23.7083 23.3762 22.1348 23.3762 19.5121V10.1929H19.4073V19.7394C19.4073 24.5476 22.1873 27.3713 26.8819 27.3713C31.5765 27.3713 34.3304 24.5214 34.3304 19.7394V10.1929H30.3613V19.5121C30.3613 22.1348 29.0413 23.7083 26.8732 23.7083H26.8819ZM62.6642 10.1929H58.4679C58.1707 13.1565 55.5304 15.4382 51.8849 16.3911V4.63281H47.916V27.0129H51.8849V22.1348C51.8849 21.2955 52.4357 20.4912 53.205 20.1503L58.739 27.0129H63.3898L56.5534 18.4892C59.5607 16.6446 62.0261 13.751 62.6642 10.1929ZM36.0264 27.0129H39.9954V19.2848C39.9954 14.8874 42.3908 13.2876 46.3511 14.022V9.87815C44.2354 9.7645 42.452 9.90437 40.6074 10.7873C36.551 12.7019 36.0264 16.3736 36.0264 20.3338V27.0129ZM80.1664 18.7603C80.1664 23.7958 83.8119 27.3713 88.9174 27.3713C92.3619 27.3713 95.1856 25.754 96.6892 22.8778L93.2273 21.3042C92.1083 23.0789 90.8144 23.8832 89.0572 23.8832C86.5744 23.8832 84.6162 22.3358 84.3889 20.1678C85.7527 20.4825 87.2564 20.666 88.7863 20.666C91.3128 20.666 94.0753 20.1677 97.1264 19.1624C97.1701 18.6816 97.1701 18.498 97.1701 18.227C97.1701 13.375 93.6382 9.81695 88.8562 9.81695C84.0741 9.81695 80.1751 13.6198 80.1751 18.7515H80.1664V18.7603ZM84.3539 16.8894C84.6948 14.8612 86.6968 13.2439 88.8649 13.2439C91.033 13.2439 92.7203 14.7738 93.0088 16.8894C91.6887 17.2566 90.2987 17.4402 88.7688 17.4402C87.2389 17.4402 85.7876 17.2566 84.3451 16.8894H84.3539ZM71.3716 13.4974C73.5396 13.4974 74.8597 15.071 74.8597 17.6937V27.0129H78.8288V17.4664C78.8288 12.6844 76.0487 9.83443 71.3803 9.83443C66.7119 9.83443 63.9056 12.6582 63.9056 17.4664V27.0129H67.8746V17.6937C67.8746 15.071 69.1947 13.4974 71.3803 13.4974H71.3716ZM14.599 20.0366C14.599 21.8812 14.1444 23.7083 12.0025 23.7083C8.85526 23.7083 8.96894 19.853 8.96894 17.6238V13.8821H5V17.6238C5 22.4058 5.93535 27.3801 11.8102 27.3801C16.3474 27.3801 18.4194 24.4165 18.4194 20.0453H14.5903H14.599V20.0366ZM5.00864 4.63281V10.1929C5.00864 12.2211 6.53858 13.8821 8.42692 13.8821H14.9924V10.1929H8.97769V4.63281H5.00864ZM108.011 20.0366C108.011 21.8812 107.556 23.7083 105.414 23.7083C102.267 23.7083 102.38 19.853 102.38 17.6238V13.8821H98.4116V17.6238C98.4116 22.4058 99.3469 27.3801 105.222 27.3801C109.759 27.3801 111.831 24.4165 111.831 20.0453H108.002L108.011 20.0366ZM98.4203 4.63281V10.1929C98.4203 12.2211 99.9501 13.8821 101.838 13.8821H108.404V10.1929H102.389V4.63281H98.4203Z" fill="#471E50"></path>
+      </svg>
     </div>
 
     <!-- Başlık: Mola Sırası -->
     <h1 class="title">Mola Sırası</h1>
 
-    <!-- Bilgi kutucuğu: her 5 saniyede güncellenecek -->
+    <!-- Bilgi kutucukları -->
     <div class="info-box">
       Sıra bilgisi her <strong>5 saniyede</strong> güncellenir.
     </div>
     <div class="info-box">
       <p class="degisken"></p>
-    </div>  
+    </div>
 
-    <!-- “Mola Sırasına Katıl” Butonu -->
+    <!-- “Mola Sırasına Katıl” Butonu (form sayfa içinde açılır) -->
     <a
-      href="https://forms.gle/bMmRf2wX3MPEyu3K7"
-      target="_blank" class="btn-primary"
+      href="https://docs.google.com/forms/d/e/1FAIpQLSfMEVF0-Z-Tt6sgmtdhuzBMUhRmSFvzmaWHk1c_95TGvUIsIA/viewform?usp=send_form"
+      id="joinQueueBtn"
+      class="btn-primary"
     >Sıraya Katıl</a>
 
-    <!-- Tablo ve 3D Loader -->
+    <!-- Google Form iframe (başta gizli) -->
+    <iframe
+      id="formFrame"
+      src="https://docs.google.com/forms/d/e/1FAIpQLSfMEVF0-Z-Tt6sgmtdhuzBMUhRmSFvzmaWHk1c_95TGvUIsIA/viewform?embedded=true"
+      loading="lazy"
+    ></iframe>
+
+    <!-- Tablo ve Loader -->
     <div class="table-wrapper">
-      <!-- 3 parçalı 3D Loader -->
       <div class="loader" id="loader">
         <div class="inner one"></div>
         <div class="inner two"></div>
@@ -473,7 +455,7 @@
       </table>
     </div>
 
-    <!-- Kart’ın hemen altında, akış içinde “v.2” ve altına telif hakkı -->
+    <!-- Versiyon ve telif -->
     <div class="card-footer">
       <div class="version">v2</div>
       <div class="copyright">
@@ -482,392 +464,185 @@
     </div>
   </div>
 
-  <!-- ---------- JavaScript Kısmı (DÜZELTİLMİŞ BİLDİRİM KODU ve TEMA GEÇİŞİ) ---------- -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenLite.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/easing/EasePack.min.js"></script>  
-<script>
-/* === 1) Yıldız Arka Planı === */
-     (function() {
-    const canvas = document.getElementById('canvas-stars');
-    const ctx = canvas.getContext('2d');
-    const dotRadius = 2;
-    const colors = ['#4e0052'];
+  <!-- ---------- JavaScript Kısmı (animasyonsuz) ---------- -->
+  <script>
+    // ******************** BURAYA KENDİ İSMİNİ VE SOYADINI YAZ ********************
+    // Örnek: const YOUR_NAME = "Umut Ablay";
+    const YOUR_NAME = "AD SOYADINIZ";
+    // **********************************************************************
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+    // 1) Mola Listesi için gerekli sabitler
+    const SHEET_ID = "1e76vIg2R_du1QcIabDJK7eqxEOV8lic3z3r9Vi9-dRQ";
+    const SHEET_NAME_QUEUE = "Form Responses 1";
+    const BASE_URL_QUEUE =
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_QUEUE)}&tqx=out:json`;
 
-    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fillStyle, alpha) {
-      let rot = Math.PI / 2 * 3;
-      let x = cx;
-      let y = cy;
-      let step = Math.PI / spikes;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - outerRadius);
-      for (let i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
-      }
-      ctx.closePath();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = fillStyle;
-      ctx.fill();
-      ctx.restore();
-    }
+    // 2) Uyarı Mesajı için gerekli sabitler
+    const SHEET_NAME_WARNING = "Uyarı/Bilgilendirme Mesajı";
+    const BASE_URL_WARNING =
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_WARNING)}&tqx=out:json`;
 
-    class Star {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.r = dotRadius;
-        this.a = Math.random() * 0.5 + 0.3;
-        this.da = (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1);
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-      }
-      update() {
-        this.a += this.da;
-        if (this.a <= 0.1 || this.a >= 1) this.da *= -1;
-      }
-      draw() {
-        drawStar(ctx, this.x, this.y, 5, this.r * 2, this.r, this.color, this.a);
-      }
-    }
+    // Önceki isim listesini ve son görülen ismi saklamak için
+    let previousNames = [];
+    let lastName = null;
 
-    let stars = [];
-    function initStars() {
-      stars = [];
-      const count = Math.floor((window.innerWidth + window.innerHeight) / 8);
-      for (let i = 0; i < count; i++) stars.push(new Star());
-    }
-    initStars();
-    window.addEventListener('resize', initStars);
+    // 5 saniyede bir mola listesini güncelleyen fonksiyon
+    async function refreshQueue() {
+      const loader = document.getElementById("loader");
+      const tbody = document.querySelector("#molaTable tbody");
 
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stars.forEach(s => { s.update(); s.draw(); });
-      requestAnimationFrame(animate);
-    }
-    animate();
-  })();
+      // Loader'ı göster
+      loader.style.display = "block";
 
-    /* === 2) Partiküllerden Logoya Birleşme === */
-    (function() {
-  const stage = document.getElementById('canvas-shapes');
-  const ctx2 = stage.getContext('2d');
-  const img = document.getElementById('logoImg');
-  const imageW = 600, imageH = 126;
-  const dotRadius = 1.5;
-  let w, h;
-
-  const offCanvas = document.createElement('canvas');
-  const offCtx = offCanvas.getContext('2d');
-  offCanvas.width = imageW;
-  offCanvas.height = imageH;
-
-  const dots = [];
-
-  function resize() {
-    w = stage.width = window.innerWidth;
-    h = stage.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  // ★ Yıldız çizme fonksiyonu
-  function drawStar(ctx, cx, cy, spikes, outerR, innerR, fillStyle, alpha) {
-    let rot = Math.PI / 2 * 3;
-    const step = Math.PI / spikes;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - outerR);
-    for (let i = 0; i < spikes; i++) {
-      // dış uç
-      ctx.lineTo(
-        cx + Math.cos(rot) * outerR,
-        cy + Math.sin(rot) * outerR
-      );
-      rot += step;
-      // iç uç
-      ctx.lineTo(
-        cx + Math.cos(rot) * innerR,
-        cy + Math.sin(rot) * innerR
-      );
-      rot += step;
-    }
-    ctx.closePath();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // Dot sınıfı
-  function Dot(x, y, r, g, b, imgX, imgY) {
-    this.x = x; this.y = y;
-    this.r = r; this.g = g; this.b = b;
-    this.targetX = imgX + (w - imageW) / 2;
-    this.targetY = imgY + (h - imageH) / 2;
-  }
-  // ★ draw() artık yıldız çiziyor
-  Dot.prototype.draw = function() {
-    drawStar(
-      ctx2,
-      this.x, this.y,
-      5,                 // 5 uçlu yıldız
-      dotRadius * 2,     // dış yarıçap
-      dotRadius,         // iç yarıçap
-      `rgb(${this.r},${this.g},${this.b})`,
-      1                  // opaklık (1 = tam görünür)
-    );
-  };
-
-  function loop() {
-    ctx2.clearRect(0, 0, w, h);
-    dots.forEach(d => d.draw());
-    requestAnimationFrame(loop);
-  }
-  loop();
-
-  function processImage() {
-    offCtx.clearRect(0, 0, imageW, imageH);
-    offCtx.drawImage(img, 0, 0, imageW, imageH);
-    const data = offCtx.getImageData(0, 0, imageW, imageH).data;
-    const pixels = [];
-    for (let i = 0; i < data.length; i += 4) {
-      if (data[i+3] !== 0) {
-        const idx = i / 4;
-        const x = idx % imageW, y = Math.floor(idx / imageW);
-        if (x % (dotRadius * 2 + 1) === 0 && y % (dotRadius * 2 + 1) === 0) {
-          pixels.push({ x, y, r: data[i], g: data[i+1], b: data[i+2] });
-        }
-      }
-    }
-    createDots(pixels);
-  }
-
-  function createDots(pixels) {
-    pixels.forEach(p => {
-      const startX = Math.random() * w;
-      const startY = Math.random() * h;
-      const dot = new Dot(startX, startY, p.r, p.g, p.b, p.x, p.y);
-      dots.push(dot);
-      const dur = 2 + Math.random() * 1;
-      const delay = 0.5 + Math.random() * 0.5;
-      TweenLite.to(dot, dur, {
-        x: dot.targetX,
-        y: dot.targetY,
-        ease: Cubic.easeInOut,
-        delay: delay
-      });
-    });
-  }
-
-  if (img.complete) processImage();
-  else img.onload = processImage;
-})();
-
-  // ******************** BURAYA KENDİ İSMİNİ VE SOYADINI YAZ ********************
-  // Örnek: const YOUR_NAME = "Umut Ablay";
-  const YOUR_NAME = "AD SOYADINIZ";
-  // **********************************************************************
-
-  // 1) Mola Listesi için gerekli sabitler
-  const SHEET_ID = "1e76vIg2R_du1QcIabDJK7eqxEOV8lic3z3r9Vi9-dRQ";
-  const SHEET_NAME_QUEUE = "Form Responses 1";
-  const BASE_URL_QUEUE =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_QUEUE)}&tqx=out:json`;
-
-  // 2) Uyarı Mesajı için gerekli sabitler
-  const SHEET_NAME_WARNING = "Uyarı/Bilgilendirme Mesajı";
-  const BASE_URL_WARNING =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME_WARNING)}&tqx=out:json`;
-
-  // Önceki isim listesini ve son görülen ismi saklamak için
-  let previousNames = [];
-  let lastName = null;
-
-  // 5 saniyede bir mola listesini güncelleyen fonksiyon
-  async function refreshQueue() {
-    const loader = document.getElementById("loader");
-    const tbody = document.querySelector("#molaTable tbody");
-
-    // Loader'ı göster
-    loader.style.display = "block";
-
-    try {
-      // Google Sheets'ten mola verisini çek
-      const res = await fetch(`${BASE_URL_QUEUE}&cacheBuster=${Date.now()}`, {
-        cache: "no-store",
-      });
-      const txt = await res.text();
-      // JSON parse etmek için metnin içinden gerçek JSON objesini ayıklıyoruz
-      const json = JSON.parse(
-        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
-      );
-      const rows = json.table.rows || [];
-
-      // Gelen satırları filtrele (başlık satırlarını atla)
-      const dataRows = rows.filter((r) => {
-        const t = r.c?.[0]?.v;
-        const n = r.c?.[1]?.v;
-        return (
-          t &&
-          n &&
-          n.toString().toLowerCase() !== "ad soyad" &&
-          t.toString().toLowerCase() !== "zaman damgası"
-        );
-      });
-
-      // Mevcut isim listesi
-      const currentNames = dataRows.map((r) => r.c[1].v);
-
-      // Debug (isteğe bağlı)
-      console.log("------- Yenileme (Queue) -------");
-      console.log("Önceki İsimler:", previousNames);
-      console.log("Mevcut İsimler:", currentNames);
-
-      // 1) Önceki listede olup, şu anda olmayan isimler için bildirim
-      previousNames.forEach((isim) => {
-        if (!currentNames.includes(isim)) {
-          lastName = isim; // Son görülen eksilen ismi güncelle
-          sendNotification(isim + ", mola sırası sende!");
-        }
-      });
-
-      // 2) Listede kimse yoksa (boş liste) ve lastName varsa, bildirim
-      //    ve ardından lastName'i sıfırla
-      if (currentNames.length === 0 && lastName) {
-        sendNotification(lastName + ", mola sırası sende!");
-        lastName = null; // Tekrar tekrar bildirim gitmesini engeller
-      }
-
-      // 3) Tabloya veri yazma
-      tbody.innerHTML = "";
-      if (dataRows.length > 0) {
-        dataRows.forEach((r, i) => {
-          const ts = r.c[0].f || r.c[0].v || "-";
-          const name = r.c[1].v || "-";
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
-          tbody.appendChild(tr);
+      try {
+        // Google Sheets'ten mola verisini çek
+        const res = await fetch(`${BASE_URL_QUEUE}&cacheBuster=${Date.now()}`, {
+          cache: "no-store",
         });
-      } else {
-        tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
+        const txt = await res.text();
+        const json = JSON.parse(
+          txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+        );
+        const rows = json.table.rows || [];
+
+        // Gelen satırları filtrele (başlık satırlarını atla)
+        const dataRows = rows.filter((r) => {
+          const t = r.c?.[0]?.v;
+          const n = r.c?.[1]?.v;
+          return (
+            t &&
+            n &&
+            n.toString().toLowerCase() !== "ad soyad" &&
+            t.toString().toLowerCase() !== "zaman damgası"
+          );
+        });
+
+        // Mevcut isim listesi
+        const currentNames = dataRows.map((r) => r.c[1].v);
+
+        // 1) Önceki listede olup, şu anda olmayan isimler için bildirim
+        previousNames.forEach((isim) => {
+          if (!currentNames.includes(isim)) {
+            lastName = isim; // Son görülen eksilen ismi güncelle
+            sendNotification(isim + ", mola sırası sende!");
+          }
+        });
+
+        // 2) Listede kimse yoksa (boş liste) ve lastName varsa, bildirim
+        if (currentNames.length === 0 && lastName) {
+          sendNotification(lastName + ", mola sırası sende!");
+          lastName = null;
+        }
+
+        // 3) Tabloya veri yazma
+        tbody.innerHTML = "";
+        if (dataRows.length > 0) {
+          dataRows.forEach((r, i) => {
+            const ts = r.c[0].f || r.c[0].v || "-";
+            const name = r.c[1].v || "-";
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${i + 1}</td><td>${ts}</td><td>${name}</td>`;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Listede kimse yok.</td></tr>`;
+        }
+
+        // Sonraki döngü için önceki isim listesini güncelle
+        previousNames = currentNames.slice();
+      } catch (e) {
+        console.error("Veri yüklenirken hata (Queue):", e);
+        tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
+      } finally {
+        // Loader'ı gizle
+        loader.style.display = "none";
       }
-
-      // Sonraki döngü için önceki isim listesini güncelle
-      previousNames = currentNames.slice();
-    } catch (e) {
-      console.error("Veri yüklenirken hata (Queue):", e);
-      tbody.innerHTML = `<tr><td colspan="3" class="placeholder">Veri yüklenemedi.</td></tr>`;
-    } finally {
-      // Loader'ı gizle
-      loader.style.display = "none";
     }
-  }
 
-  // 5 saniyede bir “Uyarı/Bilgilendirme Mesajı”nı çeken fonksiyon
-  async function refreshWarning() {
-    try {
-      const res = await fetch(`${BASE_URL_WARNING}&cacheBuster=${Date.now()}`, {
-        cache: "no-store",
-      });
-      const txt = await res.text();
-      const json = JSON.parse(
-        txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
-      );
-      const rows = json.table.rows || [];
+    // 5 saniyede bir “Uyarı/Bilgilendirme Mesajı”nı çeken fonksiyon
+    async function refreshWarning() {
+      try {
+        const res = await fetch(`${BASE_URL_WARNING}&cacheBuster=${Date.now()}`, {
+          cache: "no-store",
+        });
+        const txt = await res.text();
+        const json = JSON.parse(
+          txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)
+        );
+        const rows = json.table.rows || [];
 
-      // Eğer satır varsa, ilk satırın ikinci sütununu (B1) al
-      if (rows.length > 0 && rows[0].c?.[1]?.v) {
-        const warningText = rows[0].c[1].v;
-        document.querySelector(".degisken").innerText = warningText;
-      } else {
+        if (rows.length > 0 && rows[0].c?.[1]?.v) {
+          const warningText = rows[0].c[1].v;
+          document.querySelector(".degisken").innerText = warningText;
+        } else {
+          document.querySelector(".degisken").innerText = "";
+        }
+      } catch (e) {
+        console.error("Uyarı metni alınırken hata:", e);
         document.querySelector(".degisken").innerText = "";
       }
-    } catch (e) {
-      console.error("Uyarı metni alınırken hata:", e);
-      document.querySelector(".degisken").innerText = "";
     }
-  }
 
-  // Bildirim iznini almak için fonksiyon
-  function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-      console.log("Notification API desteklenmiyor.");
-      return;
+    // Bildirim iznini almak için fonksiyon
+    function requestNotificationPermission() {
+      if (!("Notification" in window)) {
+        console.log("Notification API desteklenmiyor.");
+        return;
+      }
+      if (Notification.permission !== "granted") {
+        Notification.requestPermission()
+          .then(permission => {
+            console.log("Bildirim izni durumu:", permission);
+          })
+          .catch(err => {
+            console.error("Bildirim izni alınamadı:", err);
+          });
+      } else {
+        console.log("Bildirim izni zaten verilmiş:", Notification.permission);
+      }
     }
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission()
-        .then(permission => {
-          console.log("Bildirim izni durumu:", permission);
-        })
-        .catch(err => {
-          console.error("Bildirim izni alınamadı:", err);
+
+    // Tarayıcı bildirimi ve ses oynatma
+    function sendNotification(message) {
+      if (Notification.permission === "granted") {
+        const notificationSound = new Audio(
+          "https://www.soundjay.com/button/beep-07.wav"
+        );
+        notificationSound.play().catch(() => {
+          // Ses çalamazsa sessizce devam et
         });
-    } else {
-      console.log("Bildirim izni zaten verilmiş:", Notification.permission);
+        new Notification(message);
+        console.log("Bildirim gönderildi:", message);
+      } else {
+        console.log("Bildirim izni verilmedi. Mesaj:", message);
+      }
     }
-  }
 
-  // Tarayıcı bildirimi ve ses oynatma
-  function sendNotification(message) {
-    if (Notification.permission === "granted") {
-      const notificationSound = new Audio(
-        "https://www.soundjay.com/button/beep-07.wav"
-      );
-      notificationSound.play().catch(() => {
-        // Ses çalamazsa sessizce devam et
-      });
-      new Notification(message);
-      console.log("Bildirim gönderildi:", message);
-    } else {
-      console.log("Bildirim izni verilmedi. Mesaj:", message);
-    }
-  }
+    // Sayfa yüklendiğinde
+    window.addEventListener("load", () => {
+      requestNotificationPermission();
 
-  
+      // "Sıraya Katıl" tıklandığında formu sayfa içinde göster
+      const joinBtn = document.getElementById("joinQueueBtn");
+      const formFrame = document.getElementById("formFrame");
+      if (joinBtn && formFrame) {
+        joinBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          formFrame.style.display = "block";
+          formFrame.scrollIntoView(); // animasyonsuz kaydırma
+        });
+      }
 
-  // Sayfa yüklendiğinde:
-  // 1) Bildirim izni istenir
-  // 2) Hem queue hem warning fonksiyonları ilk defa çağrılır
-  // 3) 5 saniyede bir her iki fonksiyon da yeniden çalışır
-  window.addEventListener("load", () => {
-    requestNotificationPermission();
-    // Tema düğmesine tıklama olayı
-    document
-      .getElementById("themeToggleBtn")
-
-    // İlk yükleme
-    refreshQueue();
-    refreshWarning();
-    // Her 5 saniyede bir yenile
-    setInterval(() => {
+      // İlk yükleme
       refreshQueue();
       refreshWarning();
-    }, 5000);
- setTimeout(() => {
-    document
-      .querySelectorAll('#canvas-shapes, #canvas-stars')
-      .forEach(canvas => {
-        // 1) Opacity’yi 0’a çek
-        canvas.classList.add('fade-out');
-        // 2) 1s sonra tamamen DOM’dan da kaldır (isteğe bağlı)
-        setTimeout(() => canvas.remove(), 1000);
-      });
-  }, 3800);
-  });
+
+      // Her 5 saniyede bir yenile
+      setInterval(() => {
+        refreshQueue();
+        refreshWarning();
+      }, 5000);
+    });
   </script>
 </body>
 </html>
